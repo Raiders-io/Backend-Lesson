@@ -33,3 +33,9 @@ Recommendation from gemini: **PostgreSQL**
 | **Lessons**        | The "Header" record.       | `id`, `slug`, `author_id`, `current_version_id`, `is_private`           |
 | **LessonVersions** | Tracks history.            | `id`, `lesson_id`, `content_ref` (file path), `editor_id`, `created_at` |
 | **LessonTags**     | For $O(\log n)$ searching. | `lesson_id`, `tag_name`                                                 |
+
+lessons: id (UUID), title (String), slug (String, indexed), author_id (UUID/Int from User Service), is_private (Boolean), file_url (String - pointing to your file service), created_at, updated_at.
+
+tags: id, name (Unique).
+
+lesson_tag: (Pivot table) lesson_id, tag_id.
