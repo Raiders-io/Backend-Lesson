@@ -32,6 +32,51 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class LessonHeaderSchema extends BaseModel {
+  static $columns = ['authorId', 'createdAt', 'id', 'isPrivate', 'lessonId', 'slug', 'title', 'updatedAt'] as const
+  $columns = LessonHeaderSchema.$columns
+  @column()
+  declare authorId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isPrivate: boolean
+  @column()
+  declare lessonId: string
+  @column()
+  declare slug: string
+  @column()
+  declare title: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class LessonTagSchema extends BaseModel {
+  static $columns = ['lessonId', 'tagId'] as const
+  $columns = LessonTagSchema.$columns
+  @column({ isPrimary: true })
+  declare lessonId: string
+  @column()
+  declare tagId: string
+}
+
+export class TagSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'name', 'tagId', 'updatedAt'] as const
+  $columns = TagSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column()
+  declare tagId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns
