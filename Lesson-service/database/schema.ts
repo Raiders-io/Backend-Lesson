@@ -59,11 +59,11 @@ export class LessonTagSchema extends BaseModel {
   @column({ isPrimary: true })
   declare lessonId: string
   @column()
-  declare tagId: string
+  declare tagId: number
 }
 
 export class TagSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'name', 'tagId', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'name', 'updatedAt'] as const
   $columns = TagSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
@@ -71,8 +71,6 @@ export class TagSchema extends BaseModel {
   declare id: number
   @column()
   declare name: string
-  @column()
-  declare tagId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

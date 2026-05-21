@@ -13,9 +13,9 @@ export default class extends BaseSchema {
         .onDelete('CASCADE')
 
       table
-        .uuid('tag_id')
+        .integer('tag_id')
         .notNullable()
-        .references('tag_id')
+        .references('id')
         .inTable('tags')
         .onDelete('CASCADE')
 
