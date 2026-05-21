@@ -9,7 +9,7 @@ export default class LessonHeader extends LessonHeaderSchema {
         pivotForeignKey: 'lesson_id',
         pivotRelatedForeignKey: 'tag_id',
         localKey: 'lessonId',
-        relatedKey: 'tagId',
+        relatedKey: 'id',
     })
     declare tags: ManyToMany<typeof Tag>
 
