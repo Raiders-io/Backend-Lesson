@@ -1,0 +1,13 @@
+services:
+  lesson-api:
+    container_name: lesson_api
+    build:
+      context: ./Lesson-service/
+    ports:
+      - "3333:3333"
+  
+  postgresql:
+    container_name: postgresql
+    image: postgres:18.4-alpine3.23
+    ports:
+      - "5432:5432" #TODO : Expose port only in dev mode, not in production

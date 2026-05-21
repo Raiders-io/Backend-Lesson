@@ -15,6 +15,8 @@ router.get('/', () => {
   return { hello: 'world' }
 })
 
+router.resource('lessons', controllers.Lessons)
+
 router
   .group(() => {
     router

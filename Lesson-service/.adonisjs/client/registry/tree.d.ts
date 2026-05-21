@@ -2,6 +2,15 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
+  lessons: {
+    index: typeof routes['lessons.index']
+    create: typeof routes['lessons.create']
+    store: typeof routes['lessons.store']
+    show: typeof routes['lessons.show']
+    edit: typeof routes['lessons.edit']
+    update: typeof routes['lessons.update']
+    destroy: typeof routes['lessons.destroy']
+  }
   auth: {
     newAccount: {
       store: typeof routes['auth.new_account.store']
