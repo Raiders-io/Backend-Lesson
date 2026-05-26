@@ -15,6 +15,7 @@ router.get('/', () => {
   return { hello: 'world' }
 })
 
+router.get('/lessons/tags', [controllers.Lessons, 'showByTags'])
 router.resource('lessons', controllers.Lessons)
 
 router

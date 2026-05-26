@@ -1,15 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import LessonHeader from '#models/lesson_header'
 
 export default class LessonsController {
   /**
    * Display a list of resource
    */
-  async index({ }: HttpContext) {
-    const lessons = [
-      { "id": 1, "title": "Getting started with adonis" },
-      { "id": 2, "title": "Learning adonis" },
-    ]
-    return Response.json({ lessons })
+  async index({ response }: HttpContext) {
+    const lessons = await LessonHeader.query().preload('tags') 
+    return response.ok(lessons)
   }
 
   /**
@@ -25,8 +23,37 @@ export default class LessonsController {
   /**
    * Show individual record
    */
-  async show({ params }: HttpContext) {
+  async show({ params, response }: HttpContext) {
+    const lesson = await LessonHeader.query()
+      .where('slug', params.id)
+      .preload('tags')
+      .firstOrFail()
+
+    return response.ok(lesson)
+  }
+
+  async showByTags({ request, response }: HttpContext) {
+    const tags: string[] = request.qs().tags ? [request.qs().tags].flat() : []
     
+    if (tags.length === 0) {
+      return response.badRequest({ message: 'At least one tag is required' })
+    
+    }
+    const query = LessonHeader.query().preload('tags')
+
+    for (const tag of tags) {
+      query.whereHas('tags', (tagQuery) => {
+        tagQuery.where('name', tag)
+      })
+    }
+    
+    const lessons = await query
+
+    if (lessons.length === 0) {
+      return response.notFound({ message: 'No lessons found with the specified tags' })
+    }
+    
+    return response.ok(lessons)
   }
 
   /**

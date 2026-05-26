@@ -11,6 +11,7 @@ export const TagFactory = factory
     }
     usedElement.add(elementName)
 
+    console.log(`Generated tag: ${elementName}`)
     return {
       name: elementName
     }
