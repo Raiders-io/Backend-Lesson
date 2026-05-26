@@ -6,6 +6,12 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
+  'lessons.show_by_tags': {
+    methods: ["GET","HEAD"],
+    pattern: '/lessons/tags',
+    tokens: [{"old":"/lessons/tags","type":0,"val":"lessons","end":""},{"old":"/lessons/tags","type":0,"val":"tags","end":""}],
+    types: placeholder as Registry['lessons.show_by_tags']['types'],
+  },
   'lessons.index': {
     methods: ["GET","HEAD"],
     pattern: '/lessons',

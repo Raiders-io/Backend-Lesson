@@ -3,6 +3,7 @@ import type { routes } from './index.ts'
 
 export interface ApiDefinition {
   lessons: {
+    showByTags: typeof routes['lessons.show_by_tags']
     index: typeof routes['lessons.index']
     create: typeof routes['lessons.create']
     store: typeof routes['lessons.store']
