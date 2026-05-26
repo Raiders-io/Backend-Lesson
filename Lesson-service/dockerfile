@@ -14,9 +14,11 @@ RUN npm ci
 FROM deps AS build
 WORKDIR /app
 COPY . .
+COPY './setup.sh' ./
+RUN chmod +x setup.sh
 EXPOSE 3333
 # RUN node ace build
-ENTRYPOINT ["npm", "run", "dev"]
+ENTRYPOINT ["sh" , "./setup.sh"]
 
 # # ----------------------------
 # # Stage 3: Production runtime
