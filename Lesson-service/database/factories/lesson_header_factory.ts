@@ -1,6 +1,5 @@
 import factory from '@adonisjs/lucid/factories'
 import LessonHeader from '#models/lesson_header'
-import Tag from '#models/tag'
 import { TagFactory } from './tag_factory.ts'
 
 export const LessonHeaderFactory = factory

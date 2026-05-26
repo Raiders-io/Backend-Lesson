@@ -17,8 +17,9 @@ COPY . .
 COPY './setup.sh' ./
 RUN chmod +x setup.sh
 EXPOSE 3333
+RUN apt-get update && apt-get install -y postgresql-client
 # RUN node ace build
-ENTRYPOINT ["sh" , "./setup.sh"]
+ENTRYPOINT ["sh" , "/app/setup.sh"]
 
 # # ----------------------------
 # # Stage 3: Production runtime
