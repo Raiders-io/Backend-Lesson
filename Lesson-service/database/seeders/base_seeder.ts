@@ -1,7 +1,5 @@
 import { LessonHeaderFactory } from '#database/factories/lesson_header_factory'
 import { TagFactory } from '#database/factories/tag_factory'
-import Tag from '#models/tag'
-import { targets } from '@adonisjs/core/logger'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class extends BaseSeeder {
