@@ -13,7 +13,7 @@ services:
       POSTGRE_DB: ${POSTGRE_DB}
     networks:
       - default-network
-      - external-network
+      - public-network
 
   postgresql:
     container_name: postgresql
@@ -40,7 +40,6 @@ networks:
   default-network:
     driver: bridge
     internal: true
-  external-network:
-    name: lesson-network
+  public-network:
     driver: bridge
     external: true
