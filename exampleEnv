@@ -1,5 +1,0 @@
-POSTGRE_USER=postgres
-POSTGRE_PASSWORD=postgres
-POSTGRE_DB=lesson_service
-POSTGRE_HOST=postgresql
-POSTGRE_PORT=5432
