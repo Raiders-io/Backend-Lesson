@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.uuid('lesson_id').notNullable().unique()
       table.string('slug').notNullable().unique()
       table.uuid('author_id').notNullable()
-      table.boolean('is_private').notNullable().defaultTo(false)
+      table.boolean('is_private').notNullable().defaultTo(false) //TODO : remove defaultTo and handle it in the controller
       table.timestamp('created_at')
       table.timestamp('updated_at')
     })

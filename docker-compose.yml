@@ -11,6 +11,7 @@ services:
         condition: service_healthy
     environment:
       POSTGRE_DB: ${POSTGRE_DB}
+      # TODO : Load the env for adonis here not in build
     networks:
       - default-network
       - public-network

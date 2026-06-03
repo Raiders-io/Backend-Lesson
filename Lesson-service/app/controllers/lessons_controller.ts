@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import LessonHeader from '#models/lesson_header'
+import db from '@adonisjs/lucid/services/db'
 
 export default class LessonsController {
   /**
@@ -13,16 +14,33 @@ export default class LessonsController {
   /**
    * Handle form submission for the create action
    */
-  async store({ request }: HttpContext) { }
+  async store({ request, response }: HttpContext) {
+    const { title, tags } = request.only(['title', 'tags'])
+
+    if (!Array.isArray(tags) || tags.length === 0) {
+      return response.badRequest({ error: 'At least one tag is required' })
+    }
+
+    const slug = title
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+    const lessonId = await db.transaction(async (trx) => {
+      const lesson = await LessonHeader.create({ title, slug }, { client: trx })
+      if (tags.length > 0) {
+        await lesson.related('tags').attach(tags, trx)
+      }
+      return lesson.lessonId
+    })
+
+    return response.created({ lessonId })
+  }
 
   /**
    * Show individual record
    */
   async show({ params, response }: HttpContext) {
-    const lesson = await LessonHeader.query()
-      .where('slug', params.id)
-      .preload('tags')
-      .firstOrFail()
+    const lesson = await LessonHeader.query().where('slug', params.id).preload('tags').firstOrFail()
 
     return response.ok(lesson)
   }
@@ -32,7 +50,6 @@ export default class LessonsController {
 
     if (tags.length === 0) {
       return response.badRequest({ message: 'At least one tag is required' })
-
     }
     const query = LessonHeader.query().preload('tags')
 
