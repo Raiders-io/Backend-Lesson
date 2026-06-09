@@ -12,9 +12,7 @@ export default class extends BaseSchema {
         .inTable('lesson_headers')
         .onDelete('CASCADE')
 
-      table
-        .string('filename')
-        .notNullable()
+      table.string('filename').notNullable()
 
       table.timestamp('created_at')
       table.timestamp('updated_at')

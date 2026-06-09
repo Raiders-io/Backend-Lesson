@@ -20,7 +20,7 @@ export default class LessonsController {
     if (!Array.isArray(tags) || tags.length === 0) {
       return response.badRequest({ error: 'At least one tag is required' })
     }
-
+    // Append username when User service is ready [TODO]
     const slug = title
       .toLowerCase()
       .replace(/\s+/g, '-')

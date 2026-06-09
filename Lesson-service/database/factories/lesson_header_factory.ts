@@ -4,7 +4,7 @@ import { TagFactory } from './tag_factory.ts'
 
 export const LessonHeaderFactory = factory
   .define(LessonHeader, async ({ faker }) => {
-    const title = faker.lorem.sentence({min:3, max:6})
+    const title = faker.lorem.sentence({ min: 3, max: 6 })
     return {
       title: title,
       slug: faker.helpers.slugify(title),
@@ -13,5 +13,5 @@ export const LessonHeaderFactory = factory
       lessonId: crypto.randomUUID(),
     }
   })
-  .relation('tags', () => TagFactory) 
+  .relation('tags', () => TagFactory)
   .build()

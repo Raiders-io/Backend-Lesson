@@ -1,4 +1,3 @@
 import { LessonTagSchema } from '#database/schema'
 
-export default class LessonTag extends LessonTagSchema {
-}
+export default class LessonTag extends LessonTagSchema {}

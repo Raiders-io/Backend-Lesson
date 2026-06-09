@@ -1,6 +1,6 @@
 services:
   lesson-api:
-    image: lesson_api
+    image: lesson_api:local
     container_name: lesson_api
     build:
       context: ./Lesson-service/
