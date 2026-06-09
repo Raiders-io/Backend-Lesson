@@ -13,7 +13,7 @@ export const TagFactory = factory
 
     console.log(`Generated tag: ${elementName}`)
     return {
-      name: elementName
+      name: elementName,
     }
   })
   .build()
