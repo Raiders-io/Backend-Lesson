@@ -6,10 +6,8 @@ export type ScannedRoutes = {
   ALL: {
     'lessons.show_by_tags': { paramsTuple?: []; params?: {} }
     'lessons.index': { paramsTuple?: []; params?: {} }
-    'lessons.create': { paramsTuple?: []; params?: {} }
     'lessons.store': { paramsTuple?: []; params?: {} }
     'lessons.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'lessons.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'lessons.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'lessons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'auth.new_account.store': { paramsTuple?: []; params?: {} }
@@ -20,17 +18,13 @@ export type ScannedRoutes = {
   GET: {
     'lessons.show_by_tags': { paramsTuple?: []; params?: {} }
     'lessons.index': { paramsTuple?: []; params?: {} }
-    'lessons.create': { paramsTuple?: []; params?: {} }
     'lessons.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'lessons.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.profile.show': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'lessons.show_by_tags': { paramsTuple?: []; params?: {} }
     'lessons.index': { paramsTuple?: []; params?: {} }
-    'lessons.create': { paramsTuple?: []; params?: {} }
     'lessons.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'lessons.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.profile.show': { paramsTuple?: []; params?: {} }
   }
   POST: {

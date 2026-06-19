@@ -1,4 +1,4 @@
-import { FileSchema } from '#database/schema'
+// import { FileSchema } from '#database/schema'
 
-export default class File extends FileSchema {
-}
+// export default class File extends FileSchema {
+// }
