@@ -16,6 +16,5 @@ export default class LessonHeader extends LessonHeaderSchema {
   @beforeCreate()
   static assignUuid(lessonHeader: LessonHeader) {
     lessonHeader.lessonId = crypto.randomUUID()
-    lessonHeader.authorId = crypto.randomUUID() // [TODO] Replace with actual user ID in a real application
   }
 }

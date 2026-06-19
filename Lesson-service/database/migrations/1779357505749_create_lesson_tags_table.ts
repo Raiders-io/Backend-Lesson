@@ -12,12 +12,7 @@ export default class extends BaseSchema {
         .inTable('lesson_headers')
         .onDelete('CASCADE')
 
-      table
-        .integer('tag_id')
-        .notNullable()
-        .references('id')
-        .inTable('tags')
-        .onDelete('CASCADE')
+      table.integer('tag_id').notNullable().references('id').inTable('tags').onDelete('CASCADE')
 
       table.primary(['lesson_id', 'tag_id'])
     })

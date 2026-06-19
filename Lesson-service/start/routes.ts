@@ -12,7 +12,7 @@ import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
 
 router.get('/', () => {
-  return { hello: 'world' }
+  return { hello: 'OuiWorld' }
 })
 
 router.get('/lessons/tags', [controllers.Lessons, 'showByTags'])

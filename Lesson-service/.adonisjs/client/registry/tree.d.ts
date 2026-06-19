@@ -5,10 +5,8 @@ export interface ApiDefinition {
   lessons: {
     showByTags: typeof routes['lessons.show_by_tags']
     index: typeof routes['lessons.index']
-    create: typeof routes['lessons.create']
     store: typeof routes['lessons.store']
     show: typeof routes['lessons.show']
-    edit: typeof routes['lessons.edit']
     update: typeof routes['lessons.update']
     destroy: typeof routes['lessons.destroy']
   }
