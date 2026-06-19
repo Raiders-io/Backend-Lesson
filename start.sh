@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIRPATH="./Backend-Lesson"
+DIRPATH="./"
 
 TZ=UTC
 PORT=3333
