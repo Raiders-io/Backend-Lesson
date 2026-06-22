@@ -10,6 +10,9 @@ export interface ApiDefinition {
     update: typeof routes['lessons.update']
     destroy: typeof routes['lessons.destroy']
   }
+  searches: {
+    index: typeof routes['searches.index']
+  }
   auth: {
     newAccount: {
       store: typeof routes['auth.new_account.store']

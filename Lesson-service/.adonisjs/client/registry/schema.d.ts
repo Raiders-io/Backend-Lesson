@@ -79,6 +79,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['destroy']>>>
     }
   }
+  'searches.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/search'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/searches_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/searches_controller').default['index']>>>
+    }
+  }
   'auth.new_account.store': {
     methods: ["POST"]
     pattern: '/api/v1/auth/signup'
