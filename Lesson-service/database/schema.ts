@@ -8,18 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = [
-    'abilities',
-    'createdAt',
-    'expiresAt',
-    'hash',
-    'id',
-    'lastUsedAt',
-    'name',
-    'tokenableId',
-    'type',
-    'updatedAt',
-  ] as const
+  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
@@ -43,28 +32,34 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class FileSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'lessonId', 'updatedAt'] as const
+  $columns = FileSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare lessonId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class LessonHeaderSchema extends BaseModel {
-  static $columns = [
-    'authorId',
-    'createdAt',
-    'id',
-    'isPrivate',
-    'lessonId',
-    'slug',
-    'title',
-    'updatedAt',
-  ] as const
+  static $columns = ['authorId', 'createdAt', 'id', 'isPrivate', 'lessonId', 'pertinence', 'slug', 'title', 'updatedAt'] as const
   $columns = LessonHeaderSchema.$columns
   @column()
   declare authorId: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
-  @column({ isPrimary: true })
+  @column()
   declare id: number
   @column()
   declare isPrivate: boolean
-  @column()
+  @column({ isPrimary: true })
   declare lessonId: string
+  @column()
+  declare pertinence: number
   @column()
   declare slug: string
   @column()
