@@ -13,6 +13,7 @@ export default class extends BaseSchema {
       table.boolean('is_private').notNullable().defaultTo(false) //TODO : remove defaultTo and handle it in the controller
       table.timestamp('created_at')
       table.timestamp('updated_at')
+      table.float('pertinence').notNullable().defaultTo(0) //TODO : remove defaultTo and handle it in the controller
     })
   }
 

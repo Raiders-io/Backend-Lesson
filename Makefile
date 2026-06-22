@@ -5,14 +5,16 @@ MAKE = make -j
 
 # Rules
 all:
-	docker network create public-network || true
-	./start.sh -i
+	@docker network create public-network || true
+	@./start.sh -i
 status:
-	docker ps -a
+	@docker images -a
+	@echo ""
+	@docker ps -a
 
 stop:
-	docker compose -f $(COMPOSE_FILE) stop
+	@docker compose -f $(COMPOSE_FILE) stop
 
 down:
-	docker compose -f $(COMPOSE_FILE) down
-	docker network rm public-network || true
+	@docker compose -f $(COMPOSE_FILE) down
+	@docker network rm public-network || true
