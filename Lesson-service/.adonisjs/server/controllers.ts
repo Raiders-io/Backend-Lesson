@@ -8,4 +8,6 @@ export const controllers = {
   Lessons: () => import('#controllers/lessons_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Profile: () => import('#controllers/profile_controller'),
+  Searches: () => import('#controllers/searches_controller'),
+  Files: () => import('#controllers/files_controller'),
 }

@@ -18,6 +18,8 @@ router.get('/', () => {
 router.get('/lessons/tags', [controllers.Lessons, 'showByTags'])
 router.resource('lessons', controllers.Lessons).apiOnly()
 
+router.get('/search', [controllers.Searches, 'index'])
+
 router
   .group(() => {
     router

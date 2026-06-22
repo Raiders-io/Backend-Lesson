@@ -42,6 +42,12 @@ const routes = {
     tokens: [{"old":"/lessons/:id","type":0,"val":"lessons","end":""},{"old":"/lessons/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['lessons.destroy']['types'],
   },
+  'searches.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/search',
+    tokens: [{"old":"/search","type":0,"val":"search","end":""}],
+    types: placeholder as Registry['searches.index']['types'],
+  },
   'auth.new_account.store': {
     methods: ["POST"],
     pattern: '/api/v1/auth/signup',

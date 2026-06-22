@@ -11,6 +11,7 @@ export const LessonHeaderFactory = factory
       authorId: crypto.randomUUID(),
       isPrivate: faker.datatype.boolean(),
       lessonId: crypto.randomUUID(),
+      pertinence: faker.number.float({ min: 0, max: 5, fractionDigits: 2 }),
     }
   })
   .relation('tags', () => TagFactory)
