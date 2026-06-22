@@ -6,7 +6,7 @@ MAKE = make -j
 # Rules
 all:
 	docker network create public-network || true
-	./start.sh
+	./start.sh -i
 status:
 	docker ps -a
 
