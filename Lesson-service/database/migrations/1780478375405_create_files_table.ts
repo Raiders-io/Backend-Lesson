@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table
         .uuid('lesson_id')
         .notNullable()
-        .references('id')
+        .references('lesson_id')
         .inTable('lesson_headers')
         .onDelete('CASCADE')
 
