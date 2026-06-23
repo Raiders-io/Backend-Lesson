@@ -49,7 +49,11 @@ export default class LessonsController {
    * Show individual record
    */
   async show({ params, response }: HttpContext) {
-    const lesson = await LessonHeader.query().where('slug', params.id).preload('tags').firstOrFail()
+    const lesson = await LessonHeader.query()
+      .where('slug', params.id)
+      .preload('tags')
+      .preload('files')
+      .firstOrFail()
 
     return response.ok(lesson)
   }

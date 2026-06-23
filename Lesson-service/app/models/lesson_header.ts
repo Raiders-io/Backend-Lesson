@@ -1,7 +1,8 @@
 import { LessonHeaderSchema } from '#database/schema'
-import { beforeCreate, manyToMany } from '@adonisjs/lucid/orm'
-import type { ManyToMany } from '@adonisjs/lucid/types/relations'
+import { beforeCreate, manyToMany, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import Tag from './tag.ts'
+import File from '#models/file'
 
 export default class LessonHeader extends LessonHeaderSchema {
   @manyToMany(() => Tag, {
@@ -12,6 +13,9 @@ export default class LessonHeader extends LessonHeaderSchema {
     relatedKey: 'id',
   })
   declare tags: ManyToMany<typeof Tag>
+
+  @hasMany(() => File)
+  declare files: HasMany<typeof File>
 
   @beforeCreate()
   static assignUuid(lessonHeader: LessonHeader) {

@@ -16,7 +16,15 @@ router.get('/', () => {
 })
 
 router.get('/lessons/tags', [controllers.Lessons, 'showByTags'])
-router.resource('lessons', controllers.Lessons).apiOnly()
+
+router
+  .group(() => {
+    router.get('/files/:fileId', [controllers.Files, 'show'])
+    router.post('/files', [controllers.Files, 'store'])
+    router.put('/files/:fileId', [controllers.Files, 'update'])
+    router.delete('/files/:fileId', [controllers.Files, 'destroy'])
+  })
+  .prefix('/lesson/:id')
 
 router.get('/search', [controllers.Searches, 'index'])
 

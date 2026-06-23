@@ -12,35 +12,29 @@ const routes = {
     tokens: [{"old":"/lessons/tags","type":0,"val":"lessons","end":""},{"old":"/lessons/tags","type":0,"val":"tags","end":""}],
     types: placeholder as Registry['lessons.show_by_tags']['types'],
   },
-  'lessons.index': {
+  'files.show': {
     methods: ["GET","HEAD"],
-    pattern: '/lessons',
-    tokens: [{"old":"/lessons","type":0,"val":"lessons","end":""}],
-    types: placeholder as Registry['lessons.index']['types'],
+    pattern: '/lesson/:id/files/:fileId',
+    tokens: [{"old":"/lesson/:id/files/:fileId","type":0,"val":"lesson","end":""},{"old":"/lesson/:id/files/:fileId","type":1,"val":"id","end":""},{"old":"/lesson/:id/files/:fileId","type":0,"val":"files","end":""},{"old":"/lesson/:id/files/:fileId","type":1,"val":"fileId","end":""}],
+    types: placeholder as Registry['files.show']['types'],
   },
-  'lessons.store': {
+  'files.store': {
     methods: ["POST"],
-    pattern: '/lessons',
-    tokens: [{"old":"/lessons","type":0,"val":"lessons","end":""}],
-    types: placeholder as Registry['lessons.store']['types'],
+    pattern: '/lesson/:id/files',
+    tokens: [{"old":"/lesson/:id/files","type":0,"val":"lesson","end":""},{"old":"/lesson/:id/files","type":1,"val":"id","end":""},{"old":"/lesson/:id/files","type":0,"val":"files","end":""}],
+    types: placeholder as Registry['files.store']['types'],
   },
-  'lessons.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/lessons/:id',
-    tokens: [{"old":"/lessons/:id","type":0,"val":"lessons","end":""},{"old":"/lessons/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['lessons.show']['types'],
+  'files.update': {
+    methods: ["PUT"],
+    pattern: '/lesson/:id/files/:fileId',
+    tokens: [{"old":"/lesson/:id/files/:fileId","type":0,"val":"lesson","end":""},{"old":"/lesson/:id/files/:fileId","type":1,"val":"id","end":""},{"old":"/lesson/:id/files/:fileId","type":0,"val":"files","end":""},{"old":"/lesson/:id/files/:fileId","type":1,"val":"fileId","end":""}],
+    types: placeholder as Registry['files.update']['types'],
   },
-  'lessons.update': {
-    methods: ["PUT","PATCH"],
-    pattern: '/lessons/:id',
-    tokens: [{"old":"/lessons/:id","type":0,"val":"lessons","end":""},{"old":"/lessons/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['lessons.update']['types'],
-  },
-  'lessons.destroy': {
+  'files.destroy': {
     methods: ["DELETE"],
-    pattern: '/lessons/:id',
-    tokens: [{"old":"/lessons/:id","type":0,"val":"lessons","end":""},{"old":"/lessons/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['lessons.destroy']['types'],
+    pattern: '/lesson/:id/files/:fileId',
+    tokens: [{"old":"/lesson/:id/files/:fileId","type":0,"val":"lesson","end":""},{"old":"/lesson/:id/files/:fileId","type":1,"val":"id","end":""},{"old":"/lesson/:id/files/:fileId","type":0,"val":"files","end":""},{"old":"/lesson/:id/files/:fileId","type":1,"val":"fileId","end":""}],
+    types: placeholder as Registry['files.destroy']['types'],
   },
   'searches.index': {
     methods: ["GET","HEAD"],
