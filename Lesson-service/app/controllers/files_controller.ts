@@ -13,7 +13,12 @@ export default class FilesController {
     //there can be multiple files associated with a lesson, so we need to handle an array of files
     const files = request.input('files', [] as Array<{ fileId: string; filename: string }>)
     await db.transaction(async (trx) => {
-      const fileRecord = 
+      const fileRecord = files.map((file) => ({
+        id: file.fileId,
+        filename: file.filename,
+        lessonId: lesson.id,
+      }))
+      await File.createMany(fileRecord, { client: trx })
     })
     return { status: 'OK', message: 'File associated with lesson successfully' }
   }
