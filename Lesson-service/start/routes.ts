@@ -17,6 +17,8 @@ router.get('/', () => {
 
 router.get('/lessons/tags', [controllers.Lessons, 'showByTags'])
 
+router.resource('lessons', controllers.Lessons).apiOnly
+
 router
   .group(() => {
     router.get('/files/:fileId', [controllers.Files, 'show'])
