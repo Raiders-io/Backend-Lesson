@@ -64,6 +64,6 @@ export default class FilesController {
 
     await file.delete()
 
-    return { status: 'deleted', messages: 'file deleted succesfully'}
+    return { status: 'deleted', messages: 'file deleted succesfully' }
   }
 }

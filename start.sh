@@ -26,6 +26,9 @@ NON_INTERACTIVE=false
 FORCE_REGENERATE=false
 HELP=false
 
+# Message broker (Redis)
+
+
 create_env(){
     cat << eof > $DIRPATH/.env
 TZ=${TZ}
