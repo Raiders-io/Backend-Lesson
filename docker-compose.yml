@@ -53,6 +53,19 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  RabbitMQ:
+    container_name: lesson-rabbitmq
+    image: rabbitmq:3.12.2-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - default-network
+    restart: unless-stopped
+
 networks:
   default-network:
     driver: bridge

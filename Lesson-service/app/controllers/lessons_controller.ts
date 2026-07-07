@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import LessonHeader from '#models/lesson_header'
 import db from '@adonisjs/lucid/services/db'
+import Tag from '#models/tag'
 
 export default class LessonsController {
   /**
@@ -58,27 +59,14 @@ export default class LessonsController {
     return response.ok(lesson)
   }
 
-  async showByTags({ request, response }: HttpContext) {
-    const tags: string[] = request.qs().tags ? [request.qs().tags].flat() : []
+  /**
+   *  Return the list of all tags avaible in the database. This endpoint is used to populate the tag selection in the frontend.
+   */
+  async showTags({ request, response }: HttpContext) {
+    const tags = await Tag.all()
 
-    if (tags.length === 0) {
-      return response.badRequest({ message: 'At least one tag is required' })
-    }
-    const query = LessonHeader.query().preload('tags')
-
-    for (const tag of tags) {
-      query.whereHas('tags', (tagQuery) => {
-        tagQuery.where('name', tag)
-      })
-    }
-
-    const lessons = await query
-
-    if (lessons.length === 0) {
-      return response.notFound({ message: 'No lessons found with the specified tags' })
-    }
-
-    return response.ok(lessons)
+    response.header('cache-control', 'public, max-age=3600') // Cache the response for 1 hour
+    return response.ok(tags)
   }
 
   /**

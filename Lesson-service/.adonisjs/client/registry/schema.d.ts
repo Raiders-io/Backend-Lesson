@@ -7,7 +7,7 @@ import type { InferInput, SimpleError } from '@vinejs/vine/types'
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
-  'lessons.show_by_tags': {
+  'lessons.show_tags': {
     methods: ["GET","HEAD"]
     pattern: '/lessons/tags'
     types: {
@@ -15,8 +15,8 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByTags']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByTags']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showTags']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showTags']>>>
     }
   }
   'lessons.index': {
