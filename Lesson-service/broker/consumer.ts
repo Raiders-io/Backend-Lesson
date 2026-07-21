@@ -1,3 +1,4 @@
+import type { RedisClientType } from '@redis/client'
 import Broker from './broker.ts'
 import { CONSUMER, GROUP } from './config.ts'
 import type { ApiEvent } from './event.ts'
@@ -42,19 +43,79 @@ class EventRouter {
         if (result.reason instanceof MsgMinorError) {
           continue
         } else {
-          throw new MsgCriticalError(`Critical error handling event of type ${event.type}: ${result.reason}`)
+          throw new MsgCriticalError(
+            `Critical error handling event of type ${event.type}: ${result.reason}`
+          )
         }
       }
     }
   }
 }
 
+export async function processMsg(
+  redis: RedisClientType,
+  stream: string,
+  message: any,
+  router: EventRouter
+) {
+  console.log(`Received message: ${message.id} - ${JSON.stringify(message.message)}`)
+  let event: ApiEvent<any>
+  try {
+    event = {
+      type: message.message.type,
+      payload: JSON.parse(message.message.payload),
+    }
+  } catch (error) {
+    console.error(`Error parsing message ${message.id}:`, error)
+    await redis.xAck(stream, GROUP, message.id)
+    return
+  }
+  try {
+    await router.dispatch(event)
+    await redis.xAck(stream, GROUP, message.id)
+  } catch (error) {
+    console.error(`Error processing message ${message.id}:`, error)
+  }
+}
+
+async function reclaimMessages(
+  redis: RedisClientType,
+  stream: string,
+  router: EventRouter,
+  minIdleTime: number,
+  sleepTime: number
+) {
+  while (true) {
+    try {
+      const result = await redis.xAutoClaim(stream, GROUP, CONSUMER, minIdleTime, '0', {
+        COUNT: 10,
+      })
+      if (result && result.messages && result.messages.length > 0) {
+        console.log(`Reclaimed ${result.messages.length} messages from stream ${stream}`)
+        for (const message of result.messages) {
+          await processMsg(redis, stream, message, router)
+        }
+      }
+    } catch (error) {
+      console.error(`Error reclaiming messages:`, error)
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, sleepTime))
+    }
+  }
+}
+
 export async function consume(stream: string) {
   const router = new EventRouter()
+  let reclaimConfig = { minIdleTime: 60000, sleepTime: 5000 } // Default reclaim configuration
 
   const api = {
     on: (eventType: string, eventHandler: EventHandler) => {
       router.on(eventType, eventHandler)
+      return api
+    },
+
+    reclaim: (minIdleTime: number, sleepTime: number) => {
+      reclaimConfig = { minIdleTime, sleepTime }
       return api
     },
 
@@ -63,15 +124,25 @@ export async function consume(stream: string) {
 
       // Create consumer group if it doesn't exist
       try {
-        await redis.xGroupCreate(stream, GROUP, '>', { MKSTREAM: true })
+        await redis.xGroupCreate(stream, GROUP, '0', { MKSTREAM: true })
         console.log(`Consumer group ${GROUP} created`)
       } catch (error) {
         console.error(`Error creating consumer group ${GROUP}:`, error)
       }
 
+      reclaimMessages(
+        redis,
+        stream,
+        router,
+        reclaimConfig.minIdleTime,
+        reclaimConfig.sleepTime
+      ).catch((error) => {
+        console.error(`Error reclaiming messages:`, error)
+      })
+
       while (true) {
         // Consume messages from the stream
-        const messages = await redis.xReadGroup(GROUP, CONSUMER, [{ key: stream, id: '0' }], {
+        const messages = await redis.xReadGroup(GROUP, CONSUMER, [{ key: stream, id: '>' }], {
           COUNT: 10,
           BLOCK: 5000,
         })
@@ -82,25 +153,7 @@ export async function consume(stream: string) {
 
         for (const streamData of messages) {
           for (const message of streamData.messages) {
-            console.log(`Received message: ${message.id} - ${JSON.stringify(message.message)}`)
-            let event: ApiEvent<any>
-            try {
-              event = {
-                type: message.message.type,
-                payload: JSON.parse(message.message.payload),
-              }
-            } catch (error) {
-              console.error(`Error parsing message ${message.id}:`, error)
-              await redis.xAck(stream, GROUP, message.id)
-              continue
-            }
-
-            try {
-              await router.dispatch(event)
-              await redis.xAck(stream, GROUP, message.id)
-            } catch (error) {
-              console.error(`Error processing message ${message.id}:`, error)
-            }
+            await processMsg(redis, stream, message, router)
           }
         }
       }
