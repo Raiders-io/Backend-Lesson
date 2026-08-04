@@ -3,6 +3,31 @@ import LessonHeader from '#models/lesson_header'
 import db from '@adonisjs/lucid/services/db'
 import Tag from '#models/tag'
 
+async function storeLesson(lessonModel: LessonHeader, tags: string[]) {
+  const lessonId = await db.transaction(async (trx) => {
+    lessonModel.useTransaction(trx)
+    await lessonModel.save()
+    if (lessonModel.tags && lessonModel.tags.length > 0) {
+      await lessonModel.related('tags').attach(tags, trx)
+    }
+    return lessonModel.lessonId
+  })
+  return lessonId
+}
+
+/**
+ *  Delete a lesson by its ID,
+ *  If authorId is provided it will delete all lesson from this author.
+ */
+
+async function deleteLesson(lessonId?: string, authorId?: string) {
+  if (authorId) {
+    await LessonHeader.query().where('authorId', authorId).delete()
+  } else if (lessonId) {
+    await LessonHeader.query().where('lessonId', lessonId).delete()
+  }
+}
+
 export default class LessonsController {
   /**
    * Display a list of resource
@@ -26,22 +51,28 @@ export default class LessonsController {
       .toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-]/g, '')
-    const lessonId = await db.transaction(async (trx) => {
-      const lesson = await LessonHeader.create(
-        {
-          title,
-          slug,
-          isPrivate: privacy ?? false,
-          authorId: '1', // Placeholder for author ID, replace with actual user ID when User service is integrated
-        },
-        { client: trx }
-      )
+    // const lessonId = await db.transaction(async (trx) => {
+    //   const lesson = await LessonHeader.create(
+    //     {
+    //       title,
+    //       slug,
+    //       isPrivate: privacy ?? false,
+    //       authorId: '1', // Placeholder for author ID, replace with actual user ID when User service is integrated
+    //     },
+    //     { client: trx }
+    //   )
 
-      if (tags.length > 0) {
-        await lesson.related('tags').attach(tags, trx)
-      }
-      return lesson.lessonId
-    })
+    //   if (tags.length > 0) {
+    //     await lesson.related('tags').attach(tags, trx)
+    //   }
+    //   return lesson.lessonId
+    // })
+    const lessonModel = new LessonHeader()
+    lessonModel.title = title
+    lessonModel.slug = slug
+    lessonModel.isPrivate = privacy ?? false
+    lessonModel.authorId = '1' // Placeholder for author ID, replace with actual user ID when User service is integrated
+    const lessonId = await storeLesson(lessonModel, tags)
 
     return response.created({ lessonId })
   }
@@ -101,6 +132,7 @@ export default class LessonsController {
     })
     return response.ok({ message: 'Lesson updated successfully' })
   }
+
   /**
    * Delete record
    */
