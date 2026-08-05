@@ -10,6 +10,15 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import { consume, publish } from '@yosone/broker'
+import { deleteLesson } from '#app/controllers/LessonsController'
+
+consume('user.service')
+  .on('user.deleted', async (event) => {
+    deleteLesson(event.payload.userId)
+    console.log('Received user.deleted event:', event)
+  })
+  .start()
 
 router
   .group(() => {
@@ -19,7 +28,7 @@ router
 
     router.get('/lessons/tags', [controllers.Lessons, 'showTags'])
 
-    router.resource('lessons', controllers.Lessons).apiOnly().use(middleware.verifyToken())
+    router.resource('lessons', controllers.Lessons).apiOnly().use('*', middleware.verifyToken())
 
     router
       .group(() => {

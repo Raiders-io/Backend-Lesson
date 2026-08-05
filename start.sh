@@ -22,13 +22,15 @@ DB_PASSWORD=$(openssl rand -base64 32 | tr -dc '[:alnum:]' | head -c 32)
 DB_DATABASE=lesson_service
 AUTH_SERVICE_URL=http://auth-service:3333
 
+# Message broker (Redis)
+GROUP="lesson-service"
+CONSUMER="lesson-service-consumer"
+REDIS_URL=redis://redis:6380
+
 #Flag
 NON_INTERACTIVE=false
 FORCE_REGENERATE=false
 HELP=false
-
-# Message broker (Redis)
-
 
 create_env(){
     cat << eof > $DIRPATH/.env
