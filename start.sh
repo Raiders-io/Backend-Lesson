@@ -20,6 +20,7 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=$(openssl rand -base64 32 | tr -dc '[:alnum:]' | head -c 32)
 DB_DATABASE=lesson_service
+AUTH_SERVICE_URL=http://auth-service:3333
 
 #Flag
 NON_INTERACTIVE=false
@@ -45,6 +46,7 @@ DB_PORT=${DB_PORT}
 DB_USER=${DB_USER}
 DB_PASSWORD=${DB_PASSWORD}
 DB_DATABASE=${DB_DATABASE}
+AUTH_SERVICE_URL=http://auth-service:3333
 eof
 }
 
@@ -135,4 +137,4 @@ if [ "$HELP" = true ]; then
     exit 0
 fi
 check_env
-docker compose -f $DIRPATH/docker-compose.yml up -d --build
+docker compose -f $DIRPATH/docker-compose.yml up -d --build --remove-orphans
