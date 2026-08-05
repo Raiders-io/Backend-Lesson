@@ -24,9 +24,10 @@ services:
       APP_KEY: ${APP_KEY}
       APP_URL: ${APP_URL}
       SESSION_DRIVER: ${SESSION_DRIVER}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
     networks:
       - default-network
-      - public-network
+      - api-network
     volumes:
       - ./Lesson-service:/app
       - /app/node_modules
@@ -53,23 +54,10 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  RabbitMQ:
-    container_name: lesson-rabbitmq
-    image: rabbitmq:3.12.2-management-alpine
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-    networks:
-      - default-network
-    restart: unless-stopped
-
 networks:
   default-network:
     driver: bridge
     internal: true
-  public-network:
+  api-network:
     driver: bridge
     external: true
