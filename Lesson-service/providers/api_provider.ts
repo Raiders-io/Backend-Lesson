@@ -65,5 +65,6 @@ HttpContext.instanceProperty('serialize', serialize)
 declare module '@adonisjs/core/http' {
   export interface HttpContext {
     serialize: typeof serialize
+    userId?: string
   }
 }
