@@ -9,7 +9,7 @@ export type ParamValue = string | number | bigint | boolean
 export interface Registry {
   'lessons.show_tags': {
     methods: ["GET","HEAD"]
-    pattern: '/lessons/tags'
+    pattern: '/api/v1/lessons/tags'
     types: {
       body: {}
       paramsTuple: []
@@ -21,7 +21,7 @@ export interface Registry {
   }
   'lessons.index': {
     methods: ["GET","HEAD"]
-    pattern: '/lessons'
+    pattern: '/api/v1/lessons'
     types: {
       body: {}
       paramsTuple: []
@@ -31,21 +31,9 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['index']>>>
     }
   }
-  'lessons.create': {
-    methods: ["GET","HEAD"]
-    pattern: '/lessons/create'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['create']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['create']>>>
-    }
-  }
   'lessons.store': {
     methods: ["POST"]
-    pattern: '/lessons'
+    pattern: '/api/v1/lessons'
     types: {
       body: {}
       paramsTuple: []
@@ -57,7 +45,7 @@ export interface Registry {
   }
   'lessons.show': {
     methods: ["GET","HEAD"]
-    pattern: '/lessons/:id'
+    pattern: '/api/v1/lessons/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -67,21 +55,9 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['show']>>>
     }
   }
-  'lessons.edit': {
-    methods: ["GET","HEAD"]
-    pattern: '/lessons/:id/edit'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['edit']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['edit']>>>
-    }
-  }
   'lessons.update': {
     methods: ["PUT","PATCH"]
-    pattern: '/lessons/:id'
+    pattern: '/api/v1/lessons/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -93,7 +69,7 @@ export interface Registry {
   }
   'lessons.destroy': {
     methods: ["DELETE"]
-    pattern: '/lessons/:id'
+    pattern: '/api/v1/lessons/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -105,7 +81,7 @@ export interface Registry {
   }
   'files.show': {
     methods: ["GET","HEAD"]
-    pattern: '/lesson/:id/files/:fileId'
+    pattern: '/api/v1/lesson/:id/files/:fileId'
     types: {
       body: {}
       paramsTuple: [ParamValue, ParamValue]
@@ -117,7 +93,7 @@ export interface Registry {
   }
   'files.store': {
     methods: ["POST"]
-    pattern: '/lesson/:id/files'
+    pattern: '/api/v1/lesson/:id/files'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -129,7 +105,7 @@ export interface Registry {
   }
   'files.update': {
     methods: ["PUT"]
-    pattern: '/lesson/:id/files/:fileId'
+    pattern: '/api/v1/lesson/:id/files/:fileId'
     types: {
       body: {}
       paramsTuple: [ParamValue, ParamValue]
@@ -141,7 +117,7 @@ export interface Registry {
   }
   'files.destroy': {
     methods: ["DELETE"]
-    pattern: '/lesson/:id/files/:fileId'
+    pattern: '/api/v1/lesson/:id/files/:fileId'
     types: {
       body: {}
       paramsTuple: [ParamValue, ParamValue]
@@ -153,7 +129,7 @@ export interface Registry {
   }
   'searches.index': {
     methods: ["GET","HEAD"]
-    pattern: '/search'
+    pattern: '/api/v1/search'
     types: {
       body: {}
       paramsTuple: []
@@ -161,54 +137,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/searches_controller').default['index']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/searches_controller').default['index']>>>
-    }
-  }
-  'auth.new_account.store': {
-    methods: ["POST"]
-    pattern: '/api/v1/auth/signup'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').signupValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').signupValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/new_account_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/new_account_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'auth.access_tokens.store': {
-    methods: ["POST"]
-    pattern: '/api/v1/auth/login'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').loginValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').loginValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'profile.profile.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/account/profile'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['show']>>>
-    }
-  }
-  'profile.access_tokens.destroy': {
-    methods: ["POST"]
-    pattern: '/api/v1/account/logout'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['destroy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['destroy']>>>
     }
   }
 }

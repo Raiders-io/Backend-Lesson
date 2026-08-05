@@ -32,4 +32,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   DB_USER: Env.schema.string(),
   DB_PASSWORD: Env.schema.string(),
   DB_DATABASE: Env.schema.string(),
+
+  // Message broker (Redis)
+
+  // Auth Service
+  AUTH_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
 })

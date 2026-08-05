@@ -3,12 +3,12 @@ import LessonHeader from '#models/lesson_header'
 import db from '@adonisjs/lucid/services/db'
 import Tag from '#models/tag'
 
-async function storeLesson(lessonModel: LessonHeader, tags: string[]) {
+export async function storeLesson(lessonModel: LessonHeader, tags: string[]) {
   const lessonId = await db.transaction(async (trx) => {
     lessonModel.useTransaction(trx)
     await lessonModel.save()
     if (lessonModel.tags && lessonModel.tags.length > 0) {
-      await lessonModel.related('tags').attach(tags, trx)
+      await lessonModel.related('tags').attach(tags)
     }
     return lessonModel.lessonId
   })
@@ -20,7 +20,7 @@ async function storeLesson(lessonModel: LessonHeader, tags: string[]) {
  *  If authorId is provided it will delete all lesson from this author.
  */
 
-async function deleteLesson(lessonId?: string, authorId?: string) {
+export async function deleteLesson(lessonId?: string, authorId?: string) {
   if (authorId) {
     await LessonHeader.query().where('authorId', authorId).delete()
   } else if (lessonId) {
@@ -42,6 +42,10 @@ export default class LessonsController {
    */
   async store({ request, response }: HttpContext) {
     const { title, tags, privacy } = request.only(['title', 'tags', 'privacy'])
+
+    const userId = request.ctx.userId
+
+    if (!userId) return response.unauthorized({ error: 'Unauthorized to create a lesson' })
 
     if (!Array.isArray(tags) || tags.length === 0) {
       return response.badRequest({ error: 'At least one tag is required' })
@@ -71,7 +75,7 @@ export default class LessonsController {
     lessonModel.title = title
     lessonModel.slug = slug
     lessonModel.isPrivate = privacy ?? false
-    lessonModel.authorId = '1' // Placeholder for author ID, replace with actual user ID when User service is integrated
+    lessonModel.authorId = userId
     const lessonId = await storeLesson(lessonModel, tags)
 
     return response.created({ lessonId })
@@ -106,8 +110,8 @@ export default class LessonsController {
   async update({ params, request, response }: HttpContext) {
     const lesson = await LessonHeader.findOrFail(params.id)
 
-    const authorId = '1' // Placeholder for author ID, replace with actual user ID when User service is integrated
-    if (lesson.authorId !== authorId) {
+    const authorId = request.ctx.userId
+    if (!authorId || lesson.authorId !== authorId) {
       return response.forbidden({ error: 'Unauthorized to update this lesson' })
     }
 
