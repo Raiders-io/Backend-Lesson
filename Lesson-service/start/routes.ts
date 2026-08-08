@@ -10,15 +10,6 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
-// import { consume, publish } from '@yosone/broker'
-// import { deleteLesson } from '#service/lesson'
-
-// consume('user.service')
-//   .on('user.deleted', async (event) => {
-//     deleteLesson(event.payload.userId)
-//     console.log('Received user.deleted event:', event)
-//   })
-//   .start()
 
 router
   .group(() => {

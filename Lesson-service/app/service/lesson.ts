@@ -1,7 +1,7 @@
 import LessonHeader from '#models/lesson_header'
 import db from '@adonisjs/lucid/services/db'
 import { publish } from '@yosone/broker'
-import type { LessonCreatedEvent, LessonDeletedEvent } from '@yosone/broker'
+import type { LessonCreatedEvent, LessonDeletedEvent, LessonUpdatedEvent } from '@yosone/broker'
 
 export class LessonOperations {
   async storeLesson(lessonModel: LessonHeader, tags: number[]) {
@@ -11,32 +11,27 @@ export class LessonOperations {
       if (tags.length > 0) {
         await lessonModel.related('tags').attach(tags, trx)
       }
-      try {
-        const event: LessonCreatedEvent = {
-          payload: {
-            lessonId: lesson.lessonId,
-            authorId: lesson.authorId,
-          },
-          type: 'lesson.created',
-        }
-        await publish('lesson.service', event)
-      } catch (error) {
-        console.error('Error occurred while publishing lesson creation:', error)
-      }
-      return lessonModel.lessonId
+      return lesson.lessonId
     })
+    try {
+      const event: LessonCreatedEvent = {
+        payload: {
+          lessonId: lessonId,
+          authorId: lessonModel.authorId,
+        },
+        type: 'lesson.created',
+      }
+      await publish('lesson.service', event)
+    } catch (error) {
+      console.error('Error occurred while publishing lesson creation:', error)
+    }
     return lessonId
   }
-
-  /**
-   *  Delete a lesson by its ID,
-   *  If authorId is provided it will delete all lesson from this author.
-   */
 
   async deleteLessonById(lessonId: string) {
     const lesson = await LessonHeader.findBy('lessonId', lessonId)
     if (!lesson) return
-    lesson.delete()
+    await lesson.delete()
     try {
       const event: LessonDeletedEvent = {
         payload: {
@@ -54,22 +49,56 @@ export class LessonOperations {
     const lessons = await LessonHeader.findManyBy('authorId', authorId)
     if (!lessons || lessons.length === 0) return
     await db.transaction(async (trx) => {
-      lessons.forEach(async (lesson) => {
+      for (const lesson of lessons) {
         lesson.useTransaction(trx)
         await lesson.delete()
-        try {
-          const event: LessonDeletedEvent = {
-            payload: {
-              lessonId: lesson.lessonId,
-            },
-            type: 'lesson.deleted',
-          }
-          await publish('lesson.service', event)
-        } catch (error) {
-          console.error('Error occurred while publishing lesson deletion:', error)
-        }
-      })
+      }
     })
+    for (const lesson of lessons) {
+      try {
+        const event: LessonDeletedEvent = {
+          payload: {
+            lessonId: lesson.lessonId,
+          },
+          type: 'lesson.deleted',
+        }
+        await publish('lesson.service', event)
+      } catch (error) {
+        console.error('Error occurred while publishing lesson deletion:', error)
+      }
+    }
+  }
+
+  async updateLesson(lesson: LessonHeader, title?: string, tags?: number[], privacy?: boolean) {
+    lesson.title = title ?? lesson.title
+    if (title) {
+      lesson.slug =
+        lesson.slug.split('/')[0] +
+        '/' +
+        title
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '')
+    }
+    lesson.isPrivate = privacy ?? lesson.isPrivate
+    const currTags = tags ?? Array.from(lesson.tags, (tag) => tag.id)
+
+    await db.transaction(async (trx) => {
+      lesson.useTransaction(trx)
+      await lesson.save()
+      await lesson.related('tags').sync(currTags)
+    })
+    try {
+      const event: LessonUpdatedEvent = {
+        payload: {
+          lessonId: lesson.lessonId,
+        },
+        type: 'lesson.updated',
+      }
+      await publish('lesson.service', event)
+    } catch (error) {
+      console.error('Error occurred while publishing lesson update:', error)
+    }
   }
 }
 
