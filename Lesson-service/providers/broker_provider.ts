@@ -1,7 +1,6 @@
 import type { ApplicationService } from '@adonisjs/core/types'
 import { Broker, consume, publish } from '@yosone/broker'
-import { LessonOperations } from '#service/lesson'
-import { LOGLEVEL } from '@yosone/broker'
+import LessonOperations from '#service/lesson'
 
 export default class BrokerProvider {
   constructor(protected app: ApplicationService) {}
@@ -34,7 +33,8 @@ export default class BrokerProvider {
   async ready() {
     consume('auth.service')
       .on('auth.user.deleted', async (event) => {
-        await LessonOperations.deleteLessonsByAuthorId()
+        const authorId: string = event.payload.userId
+        if (authorId) await LessonOperations.deleteLessonsByAuthorId(authorId)
       })
       .on('auth.user.updated', () => {})
       .start()
@@ -43,5 +43,7 @@ export default class BrokerProvider {
   /**
    * Preparing to shutdown the app
    */
-  async shutdown() {}
+  async shutdown() {
+    Broker.disconnect()
+  }
 }

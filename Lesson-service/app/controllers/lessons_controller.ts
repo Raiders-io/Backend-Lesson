@@ -3,31 +3,7 @@ import LessonHeader from '#models/lesson_header'
 import db from '@adonisjs/lucid/services/db'
 import Tag from '#models/tag'
 import LessonOperations from '#service/lesson'
-
-export async function storeLesson(lessonModel: LessonHeader, tags: number[]) {
-  const lessonId = await db.transaction(async (trx) => {
-    lessonModel.useTransaction(trx)
-    await lessonModel.save()
-    if (tags.length > 0) {
-      await lessonModel.related('tags').attach(tags, trx)
-    }
-    return lessonModel.lessonId
-  })
-  return lessonId
-}
-
-/**
- *  Delete a lesson by its ID,
- *  If authorId is provided it will delete all lesson from this author.
- */
-
-export async function deleteLesson(lessonId?: string, authorId?: string) {
-  if (authorId) {
-    await LessonHeader.query().where('authorId', authorId).delete()
-  } else if (lessonId) {
-    await LessonHeader.query().where('lessonId', lessonId).delete()
-  }
-}
+import { getUsername } from '#middleware/verify_token_middleware'
 
 export default class LessonsController {
   /**
@@ -44,18 +20,25 @@ export default class LessonsController {
   async store({ request, response }: HttpContext) {
     const { title, tags, privacy } = request.only(['title', 'tags', 'privacy'])
 
-    const userId = request.ctx?.userId
+    const userId: string = request.ctx?.userId ?? ''
+    const username = await getUsername(userId)
 
     if (!userId) return response.unauthorized({ error: 'Unauthorized to create a lesson' })
+
+    if (!username)
+      return response.badRequest({ error: 'Unable to fetch username for the given userId' })
 
     if (!Array.isArray(tags) || tags.length === 0) {
       return response.badRequest({ error: 'At least one tag is required' })
     }
     // Append username when User service is ready [TODO]
-    const slug = title
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')
+    const slug =
+      username.toLowerCase().replace(/\s+/g, '-') +
+      '/' +
+      title
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
 
     const lessonModel = new LessonHeader()
     const tagsId = await Tag.query().whereIn('name', tags).select('id')
@@ -79,6 +62,7 @@ export default class LessonsController {
   async show({ params, response }: HttpContext) {
     const lesson = await LessonHeader.query()
       .where('slug', params.id)
+      .where('isPrivate', false)
       .preload('tags')
       .preload('files')
       .firstOrFail()
@@ -108,39 +92,42 @@ export default class LessonsController {
     }
 
     const { title, tags, privacy } = request.only(['title', 'tags', 'privacy'])
-    if (title) {
-      lesson.title = title
-      lesson.slug = title
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
-    }
+    // if (title) {
+    //   lesson.title = title
+    //   lesson.slug = title
+    //     .toLowerCase()
+    //     .replace(/\s+/g, '-')
+    //     .replace(/[^a-z0-9-]/g, '')
+    // }
 
-    if (tags && (!Array.isArray(tags) || tags.length === 0)) {
-      return response.badRequest({ error: 'At least one tag is required' })
-    }
+    // if (tags && (!Array.isArray(tags) || tags.length === 0)) {
+    //   return response.badRequest({ error: 'At least one tag is required' })
+    // }
 
-    lesson.isPrivate = privacy ?? lesson.isPrivate
-    await db.transaction(async (trx) => {
-      lesson.useTransaction(trx)
-      await lesson.save()
-      await lesson.related('tags').sync(tags)
-    })
+    // lesson.isPrivate = privacy ?? lesson.isPrivate
+    // await db.transaction(async (trx) => {
+    //   lesson.useTransaction(trx)
+    //   await lesson.save()
+    //   await lesson.related('tags').sync(tags)
+    // })
+
+    lesson.load('tags')
+    await LessonOperations.updateLesson(lesson, title, tags, privacy)
     return response.ok({ message: 'Lesson updated successfully' })
   }
 
   /**
    * Delete record
    */
-  async destroy({ params, response }: HttpContext) {
+  async destroy({ request, params, response }: HttpContext) {
     const lesson = await LessonHeader.findOrFail(params.id)
 
-    const authorId = '1' // Placeholder for author ID, replace with actual user ID when User service is integrated
+    const authorId = request.ctx?.userId // Placeholder for author ID, replace with actual user ID when User service is integrated
     if (lesson.authorId !== authorId) {
       return response.badRequest({ error: 'Unauthorized to delete this lesson' })
     }
 
-    await lesson.delete()
+    await LessonOperations.deleteLessonById(lesson.lessonId)
     return response.ok({ message: 'Lesson deleted successfully' })
   }
 }
