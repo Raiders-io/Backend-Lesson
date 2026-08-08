@@ -34,7 +34,7 @@ export default class LessonsController {
    * Display a list of resource
    */
   async index({ response }: HttpContext) {
-    const lessons = await LessonHeader.query().preload('tags')
+    const lessons = await LessonHeader.query().preload('tags').where('isPrivate', false)
     return response.ok(lessons)
   }
 
