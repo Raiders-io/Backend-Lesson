@@ -28,7 +28,7 @@ services:
     networks:
       - default-network
       - api-network
-      - public-network
+      # - public-network
     volumes:
       - ./Lesson-service:/app
       - /app/node_modules
@@ -62,6 +62,6 @@ networks:
   api-network:
     driver: bridge
     external: true
-  public-network:
-    driver: bridge
-    external: true
+  # public-network:
+  #   driver: bridge
+  #   external: true

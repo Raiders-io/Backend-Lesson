@@ -27,7 +27,7 @@ The codebase is not yet production-ready from a completeness and reliability sta
 
 ### High priority
 
-- [ ] Replace hardcoded author IDs with the authenticated user ID in the lesson and file workflows
+- [X] Replace hardcoded author IDs with the authenticated user ID in the lesson and file workflows
 - [ ] Enforce real authorization for lesson ownership during create, update, delete, and file operations
 - [ ] Implement private lesson visibility rules so users can access their own private lessons while others only see public content
 - [ ] Complete the `update` action in `Lesson-service/app/controllers/files_controller.ts`
