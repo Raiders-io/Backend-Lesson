@@ -17,7 +17,12 @@ export default class LessonsController {
    * Handle form submission for the create action
    */
   async store({ request, response }: HttpContext) {
-    const { title, description, tags, privacy } = request.only(['title', 'description', 'tags', 'privacy'])
+    const { title, description, tags, privacy } = request.only([
+      'title',
+      'description',
+      'tags',
+      'privacy',
+    ])
 
     const userId: string = request.ctx?.userId ?? ''
     const username = 'toto'
