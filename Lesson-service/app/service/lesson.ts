@@ -1,7 +1,19 @@
 import LessonHeader from '#models/lesson_header'
 import db from '@adonisjs/lucid/services/db'
 import { publish } from '@yosone/broker'
-import type { LessonCreatedEvent, LessonDeletedEvent, LessonUpdatedEvent } from '@yosone/broker'
+import type {
+  LessonCreatedEvent,
+  LessonDeletedEvent,
+  LessonUpdatedEvent,
+  PublishOptions,
+} from '@yosone/broker'
+
+// const STREAM_NAME: string = 'lesson.service'
+
+const PublishOptions: PublishOptions = {
+  retry: 3,
+  retryTime: 10000,
+}
 
 export class LessonOperations {
   async storeLesson(lessonModel: LessonHeader, tags: number[]) {
@@ -21,7 +33,7 @@ export class LessonOperations {
         },
         type: 'lesson.created',
       }
-      await publish('lesson.service', event)
+      publish(STREAM_NAME, event, PublishOptions)
     } catch (error) {
       console.error('Error occurred while publishing lesson creation:', error)
     }
@@ -32,17 +44,13 @@ export class LessonOperations {
     const lesson = await LessonHeader.findBy('lessonId', lessonId)
     if (!lesson) return
     await lesson.delete()
-    try {
-      const event: LessonDeletedEvent = {
-        payload: {
-          lessonId: lesson.lessonId,
-        },
-        type: 'lesson.deleted',
-      }
-      await publish('lesson.service', event)
-    } catch (error) {
-      console.error('Error occurred while publishing lesson deletion:', error)
+    const event: LessonDeletedEvent = {
+      payload: {
+        lessonId: lessonId,
+      },
+      type: 'lesson.deleted',
     }
+    publish(STREAM_NAME, event, PublishOptions)
   }
 
   async deleteLessonsByAuthorId(authorId: string) {
@@ -55,17 +63,13 @@ export class LessonOperations {
       }
     })
     for (const lesson of lessons) {
-      try {
-        const event: LessonDeletedEvent = {
-          payload: {
-            lessonId: lesson.lessonId,
-          },
-          type: 'lesson.deleted',
-        }
-        await publish('lesson.service', event)
-      } catch (error) {
-        console.error('Error occurred while publishing lesson deletion:', error)
+      const event: LessonDeletedEvent = {
+        payload: {
+          lessonId: lesson.lessonId,
+        },
+        type: 'lesson.deleted',
       }
+      publish(STREAM_NAME, event, PublishOptions)
     }
   }
 
@@ -88,17 +92,13 @@ export class LessonOperations {
       await lesson.save()
       await lesson.related('tags').sync(currTags)
     })
-    try {
-      const event: LessonUpdatedEvent = {
-        payload: {
-          lessonId: lesson.lessonId,
-        },
-        type: 'lesson.updated',
-      }
-      await publish('lesson.service', event)
-    } catch (error) {
-      console.error('Error occurred while publishing lesson update:', error)
+    const event: LessonUpdatedEvent = {
+      payload: {
+        lessonId: lesson.lessonId,
+      },
+      type: 'lesson.updated',
     }
+    publish(STREAM_NAME, event, PublishOptions)
   }
 }
 

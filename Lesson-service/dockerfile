@@ -1,4 +1,4 @@
-FROM node:lts-bookworm-slim AS base
+FROM node:24.16.0-bookworm-slim AS base
 
 # ----------------------------
 # Stage 1: Install all dependencies
@@ -16,9 +16,10 @@ WORKDIR /app
 COPY . .
 RUN chmod +x setup.sh
 EXPOSE 3333
-RUN apt-get update && apt-get install -y postgresql-client
+# RUN apt-get update && apt-get install -y postgresql-client
 # RUN node ace build
 ENTRYPOINT ["sh" , "/app/setup.sh"]
+CMD ["npm", "run", "dev"]
 
 # # ----------------------------
 # # Stage 3: Production runtime
