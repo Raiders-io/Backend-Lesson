@@ -8,7 +8,7 @@ import type {
   PublishOptions,
 } from '@yosone/broker'
 
-// const STREAM_NAME: string = 'lesson.service'
+const STREAM_NAME: string = 'lesson.service'
 
 const PublishOptions: PublishOptions = {
   retry: 3,

@@ -27,7 +27,7 @@ The codebase is not yet production-ready from a completeness and reliability sta
 
 ### High priority
 
-- [X] Replace hardcoded author IDs with the authenticated user ID in the lesson and file workflows
+- [x] Replace hardcoded author IDs with the authenticated user ID in the lesson and file workflows
 - [ ] Enforce real authorization for lesson ownership during create, update, delete, and file operations
 - [ ] Implement private lesson visibility rules so users can access their own private lessons while others only see public content
 - [ ] Complete the `update` action in `Lesson-service/app/controllers/files_controller.ts`
@@ -78,6 +78,7 @@ These issues should be treated as high-priority fixes because they affect securi
 The current lesson controller uses a placeholder author ID and compares it against a hardcoded value. This must be replaced with the authenticated user from the auth middleware so that ownership is real and consistent across the API.
 
 Relevant files:
+
 - `Lesson-service/app/controllers/lessons_controller.ts`
 - `Lesson-service/app/controllers/files_controller.ts`
 
@@ -86,6 +87,7 @@ Relevant files:
 The search endpoint is currently hardcoded to only return public lessons. The next step is to allow the owner to see their own private lessons, while keeping other users restricted to public content.
 
 Relevant file:
+
 - `Lesson-service/app/controllers/searches_controller.ts`
 
 ### 3. File workflow completion
@@ -93,6 +95,7 @@ Relevant file:
 The file controller currently stores file references in the database, but the update route is empty and file storage integration is still missing. This should be completed before the files feature is considered complete.
 
 Relevant file:
+
 - `Lesson-service/app/controllers/files_controller.ts`
 
 ### 4. Quality and reliability
@@ -100,6 +103,7 @@ Relevant file:
 The project should be brought back to a healthy state by fixing the current TypeScript errors and adding a test suite for the core endpoints.
 
 Relevant files:
+
 - `Lesson-service/app/controllers/files_controller.ts`
 - `Lesson-service/app/controllers/lessons_controller.ts`
 - `Lesson-service/tests/`

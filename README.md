@@ -3,6 +3,7 @@
 A comprehensive lesson management service built with AdonisJS, providing functionality for creating, managing, and discovering educational lessons.
 
 ## Table of Contents
+
 1. [Quick Start](#quick-start)
 2. [Architecture](#architecture)
 3. [API Reference](#api-reference)
@@ -16,6 +17,7 @@ A comprehensive lesson management service built with AdonisJS, providing functio
 ## Quick Start
 
 ### Prerequisites
+
 - Docker & Docker Compose
 - Node.js 18+ (for local development)
 - PostgreSQL 18+ (included in Docker setup)
@@ -92,6 +94,7 @@ npm run format
 The Lesson Service is a microservice responsible for managing lesson metadata and search capabilities. Lessons themselves are stored as files in external storage, while this service maintains the lesson headers and metadata.
 
 **Key Principles:**
+
 - Lessons are identified by a unique slug
 - Each lesson belongs to an author with role-based permissions
 - Lessons can be tagged for efficient searching and categorization
@@ -100,18 +103,19 @@ The Lesson Service is a microservice responsible for managing lesson metadata an
 
 ### User Roles
 
-| Role | Permissions | Notes |
-|------|------------|-------|
-| **Author** | Create, read, update, delete own lessons | Can modify and delete lessons they created |
-| **Editor** | Read, request modifications | Can suggest changes (feature in WIP) |
-| **User** | Read public lessons | Can view and search public lessons |
-| **Moderator** | Delete, hide, revert versions | Admin capabilities (WIP) |
+| Role          | Permissions                              | Notes                                      |
+| ------------- | ---------------------------------------- | ------------------------------------------ |
+| **Author**    | Create, read, update, delete own lessons | Can modify and delete lessons they created |
+| **Editor**    | Read, request modifications              | Can suggest changes (feature in WIP)       |
+| **User**      | Read public lessons                      | Can view and search public lessons         |
+| **Moderator** | Delete, hide, revert versions            | Admin capabilities (WIP)                   |
 
 ---
 
 ## API Reference
 
 ### Base URL
+
 ```
 http://localhost:3333/api/v1
 ```
@@ -119,6 +123,7 @@ http://localhost:3333/api/v1
 ### Health Check
 
 **GET** `/`
+
 ```
 Returns: { hello: "OuiWorld" }
 Status: 200
@@ -129,16 +134,19 @@ Status: 200
 ### Account Endpoints
 
 #### Get Profile
+
 **GET** `/account/profile`
 
 Retrieve authenticated user's profile information.
 
 **Headers:**
+
 ```
 Authorization: Bearer {token}
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": "1",
@@ -148,21 +156,25 @@ Authorization: Bearer {token}
 ```
 
 **Errors:**
+
 - `401 Unauthorized`: Invalid or missing token
 
 ---
 
 #### Logout
+
 **POST** `/account/logout`
 
 Revoke the current access token.
 
 **Headers:**
+
 ```
 Authorization: Bearer {token}
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Logged out successfully"
@@ -174,11 +186,13 @@ Authorization: Bearer {token}
 ### Lesson Endpoints
 
 #### List All Lessons
+
 **GET** `/lessons`
 
 Retrieve all lessons with their tags and metadata.
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -206,14 +220,17 @@ Retrieve all lessons with their tags and metadata.
 ---
 
 #### Get Lesson by ID/Slug
+
 **GET** `/lessons/{id}`
 
 Retrieve a specific lesson by its ID or slug.
 
 **Path Parameters:**
+
 - `id`: Lesson ID or slug (string)
 
 **Response (200 OK):**
+
 ```json
 {
   "lessonId": "uuid",
@@ -233,19 +250,23 @@ Retrieve a specific lesson by its ID or slug.
 ```
 
 **Errors:**
+
 - `404 Not Found`: Lesson does not exist
 
 ---
 
 #### Get Lessons by Tags
+
 **GET** `/lessons/tags?tags=javascript&tags=beginner`
 
 Retrieve lessons filtered by one or multiple tags.
 
 **Query Parameters:**
+
 - `tags`: Tag name or array of tag names (string or array)
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -260,17 +281,20 @@ Retrieve lessons filtered by one or multiple tags.
 ```
 
 **Errors:**
+
 - `400 Bad Request`: No tags provided
 - `404 Not Found`: No lessons with specified tags
 
 ---
 
 #### Create Lesson
+
 **POST** `/lessons`
 
 Create a new lesson.
 
 **Request Body:**
+
 ```json
 {
   "title": "Advanced TypeScript",
@@ -280,6 +304,7 @@ Create a new lesson.
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "lessonId": "newly-generated-uuid"
@@ -287,29 +312,35 @@ Create a new lesson.
 ```
 
 **Validation:**
+
 - `title`: Required, string
 - `tags`: Required, non-empty array of tag IDs
 - `privacy`: Optional, boolean (default: false)
 
 **Notes:**
+
 - Slug is automatically generated from the title
 - Author ID is currently hardcoded as "1" (WIP: integrate with User Service)
 - At least one tag is required
 
 **Errors:**
+
 - `400 Bad Request`: Missing required fields or invalid tag array
 
 ---
 
 #### Update Lesson
+
 **PUT** `/lessons/{id}`
 
 Update an existing lesson.
 
 **Path Parameters:**
+
 - `id`: Lesson ID (UUID)
 
 **Request Body:**
+
 ```json
 {
   "title": "Advanced TypeScript Updated",
@@ -319,6 +350,7 @@ Update an existing lesson.
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Lesson updated successfully"
@@ -326,15 +358,18 @@ Update an existing lesson.
 ```
 
 **Authorization:**
+
 - Only the lesson author can update the lesson
 - Author ID is currently checked against hardcoded "1" (WIP)
 
 **Validation:**
+
 - `title`: Optional, string
 - `tags`: Optional, must be non-empty if provided
 - `privacy`: Optional, boolean
 
 **Errors:**
+
 - `403 Forbidden`: Unauthorized to update (not the author)
 - `400 Bad Request`: Invalid tag array
 - `404 Not Found`: Lesson not found
@@ -342,14 +377,17 @@ Update an existing lesson.
 ---
 
 #### Delete Lesson
+
 **DELETE** `/lessons/{id}`
 
 Delete a lesson.
 
 **Path Parameters:**
+
 - `id`: Lesson ID (UUID)
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Lesson deleted successfully"
@@ -357,9 +395,11 @@ Delete a lesson.
 ```
 
 **Authorization:**
+
 - Only the lesson author can delete the lesson
 
 **Errors:**
+
 - `400 Bad Request`: Unauthorized to delete
 - `404 Not Found`: Lesson not found
 
@@ -368,11 +408,13 @@ Delete a lesson.
 ### Search Endpoint
 
 #### Search Lessons
+
 **GET** `/search`
 
 Search for lessons by title and/or tags with pagination and sorting.
 
 **Query Parameters:**
+
 - `title` (or `name`): Search term for lesson title (case-insensitive)
 - `tags`: Tag name or array of tag names
 - `page`: Page number (default: 1)
@@ -381,11 +423,13 @@ Search for lessons by title and/or tags with pagination and sorting.
 - `direction`: Sort direction - `asc` or `desc` (default: `desc`)
 
 **Example Request:**
+
 ```
 GET /search?title=javascript&tags=beginner&page=1&limit=10&sortBy=created_at&direction=desc
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "meta": {
@@ -418,6 +462,7 @@ GET /search?title=javascript&tags=beginner&page=1&limit=10&sortBy=created_at&dir
 ```
 
 **Features:**
+
 - Case-insensitive title search with ILIKE operator
 - Multiple tag filtering (AND logic)
 - Only searches public lessons (privacy handling WIP)
@@ -430,6 +475,7 @@ GET /search?title=javascript&tags=beginner&page=1&limit=10&sortBy=created_at&dir
 ### Environment Variables
 
 #### Node Configuration
+
 ```env
 NODE_ENV=development          # development, production, or test
 PORT=3333                     # Server port
@@ -438,12 +484,14 @@ LOG_LEVEL=info                # debug, info, warn, error, fatal
 ```
 
 #### Application Configuration
+
 ```env
 APP_KEY=<32-char-secret>      # Generated application key for encryption
 APP_URL=http://localhost:3333 # Base URL for the application
 ```
 
 #### Database Configuration
+
 ```env
 DB_CONNECTION=pg              # Database driver (PostgreSQL)
 DB_HOST=postgresql            # Database host (or IP)
@@ -454,11 +502,13 @@ DB_DATABASE=lesson_db         # Database name
 ```
 
 #### Session Configuration
+
 ```env
 SESSION_DRIVER=memory         # memory, cookie, or database
 ```
 
 #### Other
+
 ```env
 TZ=UTC                        # Timezone for database and logs
 ```
@@ -466,10 +516,12 @@ TZ=UTC                        # Timezone for database and logs
 ### Docker Configuration
 
 The `docker-compose.yml` includes:
+
 - **lesson-api**: AdonisJS application on port 3333
 - **postgresql**: PostgreSQL 18.4 on port 5432
 
 **Networks:**
+
 - `default-network`: Internal network for service communication
 - `public-network`: Shared network with other microservices
 
@@ -489,6 +541,7 @@ make down     # Stop and remove all services and network
 ### Tables
 
 #### Users Table
+
 ```sql
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -501,6 +554,7 @@ CREATE TABLE users (
 ```
 
 #### Lesson Headers Table
+
 ```sql
 CREATE TABLE lesson_headers (
   lesson_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -514,6 +568,7 @@ CREATE TABLE lesson_headers (
 ```
 
 #### Tags Table
+
 ```sql
 CREATE TABLE tags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -524,6 +579,7 @@ CREATE TABLE tags (
 ```
 
 #### Lesson Tags (Pivot) Table
+
 ```sql
 CREATE TABLE lesson_tags (
   lesson_id UUID NOT NULL,
@@ -536,6 +592,7 @@ CREATE TABLE lesson_tags (
 ```
 
 #### Access Tokens Table
+
 ```sql
 CREATE TABLE access_tokens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -549,6 +606,7 @@ CREATE TABLE access_tokens (
 ```
 
 #### Files Table
+
 ```sql
 CREATE TABLE files (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -565,12 +623,14 @@ CREATE TABLE files (
 ## Work in Progress
 
 ### High Priority
+
 - [ ] **Author ID Integration**: Replace hardcoded "1" with actual user ID from authentication (affects `/lessons`, `/lessons/{id}`, and update/delete authorization)
 - [ ] **Private Lesson Access Control**: Implement permission checks to allow users to access their private lessons in search and get endpoints
 - [ ] **Files Controller Implementation**: Complete file upload, retrieval, update, and deletion endpoints
 - [ ] **File Service Integration**: Integrate with external file storage service for lesson content
 
 ### Medium Priority
+
 - [ ] **Role-Based Access Control**: Implement Editor and Moderator roles with appropriate permissions
 - [ ] **Lesson Versioning**: Track lesson history and allow reverting to previous versions
 - [ ] **Modification Requests**: Allow Editors to request modifications with change tracking
@@ -580,6 +640,7 @@ CREATE TABLE files (
 - [ ] **Request Logging**: Add comprehensive request/response logging for debugging
 
 ### Low Priority
+
 - [ ] **Lesson Preview Endpoint**: Implement preview functionality without full access requirements
 - [ ] **Batch Operations**: Support bulk delete, update, and tag operations
 - [ ] **Advanced Search Filters**: Add date range, author, and nested tag filtering
@@ -588,6 +649,7 @@ CREATE TABLE files (
 - [ ] **Analytics**: Track lesson views and popular lessons
 
 ### Known Issues
+
 - Database port 5432 is commented out in docker-compose.yml for production safety
 - Author authorization checks are not integrated with actual user service
 - Private lesson access is not enforced in search results
@@ -682,7 +744,8 @@ npm run typecheck
 
 **Error**: `connect ECONNREFUSED 127.0.0.1:5432`
 
-**Solution**: 
+**Solution**:
+
 - Ensure PostgreSQL container is running: `docker compose ps`
 - Check database credentials in `.env`
 - Verify network connectivity: `docker network ls`
@@ -692,6 +755,7 @@ npm run typecheck
 **Error**: `Migration failed`
 
 **Solution**:
+
 - Check migration files for syntax errors
 - Ensure database exists
 - Review database logs: `docker compose logs postgresql`
@@ -701,5 +765,6 @@ npm run typecheck
 **Error**: `Address already in use :::3333`
 
 **Solution**:
+
 - Kill process on port 3333: `lsof -ti:3333 | xargs kill -9`
 - Or change PORT in `.env`
