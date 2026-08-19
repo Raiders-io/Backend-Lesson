@@ -44,7 +44,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_PORT: ${DB_PORT}
     volumes:
-      - ./postgresql-data:/var/lib/postgresql
+      - pg-data:/var/lib/postgresql
     networks:
       - default-network
     healthcheck:
@@ -55,12 +55,13 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+volumes:
+  pg-data:
 networks:
   default-network:
     driver: bridge
     internal: true
   api-network:
-    driver: bridge
     external: true
   # public-network:
   #   driver: bridge

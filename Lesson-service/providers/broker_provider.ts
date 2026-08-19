@@ -1,5 +1,5 @@
 import type { ApplicationService } from '@adonisjs/core/types'
-import { Broker, consume, publish } from '@yosone/broker'
+import { Broker, consume } from '@yosone/broker'
 import LessonOperations from '#service/lesson'
 
 export default class BrokerProvider {
@@ -8,14 +8,7 @@ export default class BrokerProvider {
   /**
    * Register bindings to the container
    */
-  register() {
-    Broker.init({
-      group: 'lesosn-service',
-      consumer: 'lesson-consumer',
-      redisUrl: process.env.REDIS_URL || 'redis://redis:6380',
-      logLevel: 4,
-    })
-  }
+  register() {}
 
   /**
    * The container bindings have booted
@@ -31,6 +24,13 @@ export default class BrokerProvider {
    * The process has been started
    */
   async ready() {
+    Broker.init({
+      group: 'lesosn-service',
+      consumer: 'lesson-consumer',
+      redisUrl: 'redis://redis:6379',
+      logLevel: 4,
+    })
+
     consume('auth.service')
       .on('auth.user.deleted', async (event) => {
         const authorId: string = event.payload.userId
@@ -44,6 +44,6 @@ export default class BrokerProvider {
    * Preparing to shutdown the app
    */
   async shutdown() {
-    Broker.disconnect()
+    await Broker.disconnect()
   }
 }

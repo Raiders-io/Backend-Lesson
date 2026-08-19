@@ -21,6 +21,7 @@ export async function getUsername(token: string): Promise<string | null> {
     const res = await fetch(`${env.get('AUTH_SERVICE_URL')}api/v1/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
+    console.log('Fetching username with token:', res)
     if (!res.ok) return null
     const body = (await res.json()) as { data: { fullName: string } }
     return body.data.fullName

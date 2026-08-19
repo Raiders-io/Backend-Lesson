@@ -1,6 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import LessonHeader from '#models/lesson_header'
-import db from '@adonisjs/lucid/services/db'
 import Tag from '#models/tag'
 import LessonOperations from '#service/lesson'
 import { getUsername } from '#middleware/verify_token_middleware'
@@ -18,10 +17,10 @@ export default class LessonsController {
    * Handle form submission for the create action
    */
   async store({ request, response }: HttpContext) {
-    const { title, tags, privacy } = request.only(['title', 'tags', 'privacy'])
+    const { title, description, tags, privacy } = request.only(['title', 'description', 'tags', 'privacy'])
 
     const userId: string = request.ctx?.userId ?? ''
-    const username = await getUsername(userId)
+    const username = 'toto'
 
     if (!userId) return response.unauthorized({ error: 'Unauthorized to create a lesson' })
 
@@ -47,6 +46,7 @@ export default class LessonsController {
     lessonModel.slug = slug
     lessonModel.isPrivate = privacy ?? false
     lessonModel.authorId = userId
+    lessonModel.description = description
 
     const lessonId = await LessonOperations.storeLesson(
       lessonModel,
@@ -76,7 +76,7 @@ export default class LessonsController {
   async showTags({ response }: HttpContext) {
     const tags = await Tag.all()
 
-    response.header('cache-control', 'public, max-age=3600') // Cache the response for 1 hour
+    // response.header('cache-control', 'public, max-age=3600') // Cache the response for 1 hour
     return response.ok(tags)
   }
 
