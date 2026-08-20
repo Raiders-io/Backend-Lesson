@@ -149,7 +149,7 @@ export default class LessonsController {
    * Handle form submission for the edit action
    */
   async updateById({ params, request, response }: HttpContext) {
-    const lesson = await LessonHeader.findOrFail(params.lessonId)
+    const lesson = await LessonHeader.findOrFail(params.id)
 
     const authorId = request.ctx?.userId
     if (!authorId || lesson.authorId !== authorId) {

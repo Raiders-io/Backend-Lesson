@@ -6,9 +6,9 @@ export type ScannedRoutes = {
   ALL: {
     'lessons.show_tags': { paramsTuple?: []; params?: {} }
     'lessons.index': { paramsTuple?: []; params?: {} }
+    'lessons.store': { paramsTuple?: []; params?: {} }
     'lessons.show_by_author': { paramsTuple: [ParamValue]; params: {'author': ParamValue} }
     'lessons.show_by_content': { paramsTuple: [ParamValue,ParamValue]; params: {'author': ParamValue,'content': ParamValue} }
-    'lessons.store': { paramsTuple?: []; params?: {} }
     'lessons.update_by_content': { paramsTuple: [ParamValue,ParamValue]; params: {'author': ParamValue,'content': ParamValue} }
     'lessons.destroy_by_content': { paramsTuple: [ParamValue,ParamValue]; params: {'author': ParamValue,'content': ParamValue} }
     'lessons.show_by_id': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
