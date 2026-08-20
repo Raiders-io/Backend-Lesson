@@ -8,18 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = [
-    'abilities',
-    'createdAt',
-    'expiresAt',
-    'hash',
-    'id',
-    'lastUsedAt',
-    'name',
-    'tokenableId',
-    'type',
-    'updatedAt',
-  ] as const
+  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
@@ -57,21 +46,10 @@ export class FileSchema extends BaseModel {
 }
 
 export class LessonHeaderSchema extends BaseModel {
-  static $columns = [
-    'authorId',
-    'createdAt',
-    'description',
-    'id',
-    'isPrivate',
-    'lessonId',
-    'pertinence',
-    'slug',
-    'title',
-    'updatedAt',
-  ] as const
+  static $columns = ['author', 'createdAt', 'description', 'id', 'isPrivate', 'lessonId', 'pertinence', 'slug', 'title', 'updatedAt'] as const
   $columns = LessonHeaderSchema.$columns
   @column()
-  declare authorId: string
+  declare author: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
   @column()

@@ -3,6 +3,7 @@ import LessonHeader from '#models/lesson_header'
 import Tag from '#models/tag'
 import LessonOperations from '#service/lesson'
 import { getUsername } from '#middleware/verify_token_middleware'
+import type { UserInfo } from '#middleware/verify_token_middleware'
 
 export default class LessonsController {
   /**
@@ -25,32 +26,34 @@ export default class LessonsController {
     ])
 
     const userId: string = request.ctx?.userId ?? ''
-    const username = 'toto'
+    const userInfo: UserInfo | null = await getUsername(request.header('authorization')?.replace('Bearer ', '') ?? '')
 
     if (!userId) return response.unauthorized({ error: 'Unauthorized to create a lesson' })
 
-    if (!username)
+    if (!userInfo?.username)
       return response.badRequest({ error: 'Unable to fetch username for the given userId' })
 
     if (!Array.isArray(tags) || tags.length === 0) {
       return response.badRequest({ error: 'At least one tag is required' })
     }
     // Append username when User service is ready [TODO]
-    const slug =
-      username.toLowerCase().replace(/\s+/g, '-') +
-      '/' +
-      title
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
+    const slug = title
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
 
     const lessonModel = new LessonHeader()
     const tagsId = await Tag.query().whereIn('name', tags).select('id')
 
+    const query = await LessonHeader.query().where('author', userInfo?.username).where('slug', slug).first()
+    if (query) {
+      return response.badRequest({ error: 'A lesson with the same title already exists' })
+    }
+
     lessonModel.title = title
     lessonModel.slug = slug
     lessonModel.isPrivate = privacy ?? false
-    lessonModel.authorId = userId
+    lessonModel.author = userInfo.username
     lessonModel.description = description
 
     const lessonId = await LessonOperations.storeLesson(
@@ -75,6 +78,20 @@ export default class LessonsController {
     return response.ok(lesson)
   }
 
+  /**
+   * Show lessons by author
+   *
+   */
+  async showByAuthor({ params, response }: HttpContext) {
+    const authorId = params.author
+
+    const lessons = await LessonOperations.getLessonByAuthor(authorId)
+
+    if (!lessons || lessons.length === 0) {
+      return response.notFound({ error: 'No lessons found for the given author' })
+    }
+    return response.ok(lessons)
+  }
   /**
    *  Return the list of all tags avaible in the database. This endpoint is used to populate the tag selection in the frontend.
    */
