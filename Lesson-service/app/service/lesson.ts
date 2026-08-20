@@ -15,6 +15,14 @@ const PublishOptions: PublishOptions = {
   retryTime: 10000,
 }
 
+export interface LessonDataInterface {
+  title?: string
+  tags?: number[]
+  privacy?: boolean
+  description?: string
+  username?: string
+}
+
 export class LessonOperations {
   async storeLesson(lessonModel: LessonHeader, tags: number[]) {
     const lessonId = await db.transaction(async (trx) => {
@@ -73,16 +81,31 @@ export class LessonOperations {
     }
   }
 
-  async updateLesson(lesson: LessonHeader, title?: string, tags?: number[], privacy?: boolean) {
-    lesson.title = title ?? lesson.title
-    if (title) {
-      lesson.slug = title
+  async updateLesson(lesson: LessonHeader, lessonData: LessonDataInterface) {
+    lesson.title = lessonData.title ?? lesson.title
+    if (lessonData.title) {
+      lesson.slug = lessonData.title
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '')
     }
-    lesson.isPrivate = privacy ?? lesson.isPrivate
-    const currTags = tags ?? Array.from(lesson.tags, (tag) => tag.id)
+
+    const duplicate = await LessonHeader.query()
+      .where('author', lesson.author)
+      .where('slug', lesson.slug)
+      .whereNot('lessonId', lesson.lessonId)
+      .first()
+
+    if (duplicate) {
+      throw new Error('A lesson with the same title already exists')
+    }
+
+    lesson.isPrivate = lessonData.privacy ?? lesson.isPrivate
+    lesson.description = lessonData.description ?? lesson.description
+    lesson.author = lessonData.username ?? lesson.author
+    const currTags = lessonData.tags?.length
+      ? lessonData.tags
+      : Array.from(lesson.tags, (tag) => tag.id)
 
     await db.transaction(async (trx) => {
       lesson.useTransaction(trx)
@@ -103,9 +126,8 @@ export class LessonOperations {
     return lessons
   }
 
-  async getLessonByAuthorAndContent(author: string, contentId: string) {
-    const lessons = await LessonHeader.findManyBy('author', author)
-    const lesson = lessons.find((content) => content.slug === contentId)
+  async getLessonByAuthorAndContent(author: string, content: string) {
+    const lesson = await LessonHeader.query().where('author', author).where('slug', content)
     return lesson
   }
 

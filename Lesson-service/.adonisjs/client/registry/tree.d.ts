@@ -6,10 +6,13 @@ export interface ApiDefinition {
     showTags: typeof routes['lessons.show_tags']
     index: typeof routes['lessons.index']
     showByAuthor: typeof routes['lessons.show_by_author']
-    show: typeof routes['lessons.show']
+    showByContent: typeof routes['lessons.show_by_content']
     store: typeof routes['lessons.store']
-    update: typeof routes['lessons.update']
-    destroy: typeof routes['lessons.destroy']
+    updateByContent: typeof routes['lessons.update_by_content']
+    destroyByContent: typeof routes['lessons.destroy_by_content']
+    showById: typeof routes['lessons.show_by_id']
+    updateById: typeof routes['lessons.update_by_id']
+    destroyById: typeof routes['lessons.destroy_by_id']
   }
   files: {
     show: typeof routes['files.show']

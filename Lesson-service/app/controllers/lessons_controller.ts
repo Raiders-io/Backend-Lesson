@@ -4,6 +4,7 @@ import Tag from '#models/tag'
 import LessonOperations from '#service/lesson'
 import { getUsername } from '#middleware/verify_token_middleware'
 import type { UserInfo } from '#middleware/verify_token_middleware'
+import type { LessonDataInterface } from '#service/lesson'
 
 export default class LessonsController {
   /**
@@ -15,66 +16,13 @@ export default class LessonsController {
   }
 
   /**
-   * Handle form submission for the create action
-   */
-  async store({ request, response }: HttpContext) {
-    const { title, description, tags, privacy } = request.only([
-      'title',
-      'description',
-      'tags',
-      'privacy',
-    ])
-
-    const userId: string = request.ctx?.userId ?? ''
-    const userInfo: UserInfo | null = await getUsername(request.header('authorization')?.replace('Bearer ', '') ?? '')
-
-    if (!userId) return response.unauthorized({ error: 'Unauthorized to create a lesson' })
-
-    if (!userInfo?.username)
-      return response.badRequest({ error: 'Unable to fetch username for the given userId' })
-
-    if (!Array.isArray(tags) || tags.length === 0) {
-      return response.badRequest({ error: 'At least one tag is required' })
-    }
-    // Append username when User service is ready [TODO]
-    const slug = title
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')
-
-    const lessonModel = new LessonHeader()
-    const tagsId = await Tag.query().whereIn('name', tags).select('id')
-
-    const query = await LessonHeader.query().where('author', userInfo?.username).where('slug', slug).first()
-    if (query) {
-      return response.badRequest({ error: 'A lesson with the same title already exists' })
-    }
-
-    lessonModel.title = title
-    lessonModel.slug = slug
-    lessonModel.isPrivate = privacy ?? false
-    lessonModel.author = userInfo.username
-    lessonModel.description = description
-
-    const lessonId = await LessonOperations.storeLesson(
-      lessonModel,
-      Array.from(tagsId, (tag) => tag.id)
-    )
-
-    return response.created({ lessonId })
-  }
-
-  /**
    * Show individual record
    */
-  async show({ params, response }: HttpContext) {
-    const lesson = await LessonHeader.query()
-      .where('slug', params.id)
-      .where('isPrivate', false)
-      .preload('tags')
-      .preload('files')
-      .firstOrFail()
-
+  async showByContent({ params, response }: HttpContext) {
+    const lesson = await LessonOperations.getLessonByAuthorAndContent(params.author, params.content)
+    if (!lesson || lesson.length === 0) {
+      return response.notFound({ error: 'Lesson not found' })
+    }
     return response.ok(lesson)
   }
 
@@ -92,6 +40,7 @@ export default class LessonsController {
     }
     return response.ok(lessons)
   }
+
   /**
    *  Return the list of all tags avaible in the database. This endpoint is used to populate the tag selection in the frontend.
    */
@@ -103,50 +52,153 @@ export default class LessonsController {
   }
 
   /**
-   * Handle form submission for the edit action
+   * Show individual record by ID
    */
-  async update({ params, request, response }: HttpContext) {
-    const lesson = await LessonHeader.findOrFail(params.id)
+  async showById({ params, response }: HttpContext) {
+    const lesson = await LessonOperations.getLessonById(params.id)
+    console.log('params.id', params.id)
+    if (!lesson) {
+      return response.notFound({ error: 'Lesson not found' })
+    }
+    return response.ok(lesson)
+  }
+
+  /**
+   * Handle form submission for the create action
+   */
+  async store({ request, response }: HttpContext) {
+    const lessonDataInterface: LessonDataInterface = request.only([
+      'title',
+      'description',
+      'tags',
+      'privacy',
+    ])
+
+    const userId: string = request.ctx?.userId ?? ''
+    const userInfo: UserInfo | null = await getUsername(
+      request.header('authorization')?.replace('Bearer ', '') ?? ''
+    )
+
+    if (!userId) return response.unauthorized({ error: 'Unauthorized to create a lesson' })
+
+    if (!userInfo)
+      return response.badRequest({ error: 'Unable to fetch user info for the given userId' })
+
+    if (!lessonDataInterface.title) {
+      return response.badRequest({ error: 'Title is required' })
+    }
+
+    if (!Array.isArray(lessonDataInterface.tags) || lessonDataInterface.tags.length === 0) {
+      return response.badRequest({ error: 'At least one tag is required' })
+    }
+
+    const slug = lessonDataInterface.title
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+
+    const lessonModel = new LessonHeader()
+
+    const query = await LessonHeader.query()
+      .where('author', userInfo.username)
+      .where('slug', slug)
+      .first()
+    if (query) {
+      return response.badRequest({ error: 'A lesson with the same title already exists' })
+    }
+
+    lessonModel.title = lessonDataInterface.title
+    lessonModel.slug = slug
+    lessonModel.isPrivate = lessonDataInterface.privacy ?? false
+    lessonModel.author = userInfo.username
+    lessonModel.authorId = userInfo.id
+    lessonModel.description = lessonDataInterface.description ?? ''
+
+    let lessonId: string
+    lessonId = await LessonOperations.storeLesson(lessonModel, lessonDataInterface.tags)
+
+    return response.created({ lessonId })
+  }
+
+  /**
+   * Handle form submission for the edit action by author/content
+   */
+  async updateByContent({ params, request, response }: HttpContext) {
+    const lesson = await LessonHeader.query()
+      .where('author', params.author)
+      .where('slug', params.content)
+      .first()
+    if (!lesson) {
+      return response.notFound({ error: 'Lesson not found' })
+    }
 
     const authorId = request.ctx?.userId
     if (!authorId || lesson.authorId !== authorId) {
       return response.forbidden({ error: 'Unauthorized to update this lesson' })
     }
 
-    const { title, tags, privacy } = request.only(['title', 'tags', 'privacy'])
-    // if (title) {
-    //   lesson.title = title
-    //   lesson.slug = title
-    //     .toLowerCase()
-    //     .replace(/\s+/g, '-')
-    //     .replace(/[^a-z0-9-]/g, '')
-    // }
+    const lessonDataInterface = request.only(['title', 'tags', 'description', 'privacy'])
+    try {
+      await LessonOperations.updateLesson(lesson, lessonDataInterface)
+    } catch (error) {
+      return response.badRequest({ error: 'Failed to update lesson' })
+    }
+    return response.ok({ message: 'Lesson updated successfully' })
+  }
+  /**
+   * Handle form submission for the edit action
+   */
+  async updateById({ params, request, response }: HttpContext) {
+    const lesson = await LessonHeader.findOrFail(params.lessonId)
 
-    // if (tags && (!Array.isArray(tags) || tags.length === 0)) {
-    //   return response.badRequest({ error: 'At least one tag is required' })
-    // }
+    const authorId = request.ctx?.userId
+    if (!authorId || lesson.authorId !== authorId) {
+      return response.forbidden({ error: 'Unauthorized to update this lesson' })
+    }
 
-    // lesson.isPrivate = privacy ?? lesson.isPrivate
-    // await db.transaction(async (trx) => {
-    //   lesson.useTransaction(trx)
-    //   await lesson.save()
-    //   await lesson.related('tags').sync(tags)
-    // })
+    const lessonUpdateData: LessonDataInterface = request.only([
+      'title',
+      'tags',
+      'privacy',
+      'description',
+    ])
 
     lesson.load('tags')
-    await LessonOperations.updateLesson(lesson, title, tags, privacy)
+    try {
+      await LessonOperations.updateLesson(lesson, lessonUpdateData)
+    } catch (error) {
+      return response.badRequest({ error: 'Failed to update lesson' })
+    }
     return response.ok({ message: 'Lesson updated successfully' })
   }
 
   /**
    * Delete record
    */
-  async destroy({ request, params, response }: HttpContext) {
+  async destroyById({ request, params, response }: HttpContext) {
     const lesson = await LessonHeader.findOrFail(params.id)
 
-    const authorId = request.ctx?.userId // Placeholder for author ID, replace with actual user ID when User service is integrated
+    const authorId = request.ctx?.userId
     if (lesson.authorId !== authorId) {
       return response.badRequest({ error: 'Unauthorized to delete this lesson' })
+    }
+
+    await LessonOperations.deleteLessonById(lesson.lessonId)
+    return response.ok({ message: 'Lesson deleted successfully' })
+  }
+
+  async destroyByContent({ request, params, response }: HttpContext) {
+    const lesson = await LessonHeader.query()
+      .where('author', params.author)
+      .where('content', params.content)
+      .first()
+    if (!lesson) {
+      return response.notFound({ error: 'Lesson not found' })
+    }
+
+    const authorId = request.ctx?.userId
+    if (!authorId || lesson.authorId !== authorId) {
+      return response.forbidden({ error: 'Unauthorized to delete this lesson' })
     }
 
     await LessonOperations.deleteLessonById(lesson.lessonId)
