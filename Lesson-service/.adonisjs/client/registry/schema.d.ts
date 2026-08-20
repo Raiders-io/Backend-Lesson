@@ -31,30 +31,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['index']>>>
     }
   }
-  'lessons.show_by_author': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/lessons/:author'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { author: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByAuthor']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByAuthor']>>>
-    }
-  }
-  'lessons.show_by_content': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/lessons/:author/:content'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue, ParamValue]
-      params: { author: ParamValue; content: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByContent']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByContent']>>>
-    }
-  }
   'lessons.store': {
     methods: ["POST"]
     pattern: '/api/v1/lessons'
@@ -67,9 +43,33 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['store']>>>
     }
   }
+  'lessons.show_by_author': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/lessons/cnt/:author'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { author: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByAuthor']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByAuthor']>>>
+    }
+  }
+  'lessons.show_by_content': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/lessons/cnt/:author/:content'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { author: ParamValue; content: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByContent']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByContent']>>>
+    }
+  }
   'lessons.update_by_content': {
     methods: ["PUT"]
-    pattern: '/api/v1/lessons/:author/:content'
+    pattern: '/api/v1/lessons/cnt/:author/:content'
     types: {
       body: {}
       paramsTuple: [ParamValue, ParamValue]
@@ -81,7 +81,7 @@ export interface Registry {
   }
   'lessons.destroy_by_content': {
     methods: ["DELETE"]
-    pattern: '/api/v1/lessons/:author/:content'
+    pattern: '/api/v1/lessons/cnt/:author/:content'
     types: {
       body: {}
       paramsTuple: [ParamValue, ParamValue]

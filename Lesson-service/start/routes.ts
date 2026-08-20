@@ -19,18 +19,21 @@ router
 
         router.group(() => {
           router.get('/', [controllers.Lessons, 'index'])
-          router.get('/:author', [controllers.Lessons, 'showByAuthor'])
-          router.get('/:author/:content', [controllers.Lessons, 'showByContent'])
-
           router.post('/', [controllers.Lessons, 'store']).middleware([middleware.verifyToken()])
 
           router
-            .put('/:author/:content', [controllers.Lessons, 'updateByContent'])
-            .middleware([middleware.verifyToken()])
+            .group(() => {
+              router.get('/:author', [controllers.Lessons, 'showByAuthor'])
+              router.get('/:author/:content', [controllers.Lessons, 'showByContent'])
+              router
+                .put('/:author/:content', [controllers.Lessons, 'updateByContent'])
+                .middleware([middleware.verifyToken()])
 
-          router
-            .delete('/:author/:content', [controllers.Lessons, 'destroyByContent'])
-            .middleware([middleware.verifyToken()])
+              router
+                .delete('/:author/:content', [controllers.Lessons, 'destroyByContent'])
+                .middleware([middleware.verifyToken()])
+            })
+            .prefix('/cnt')
         })
 
         router
