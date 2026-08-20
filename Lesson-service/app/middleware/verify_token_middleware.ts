@@ -3,18 +3,20 @@ import type { NextFn } from '@adonisjs/core/types/http'
 import env from '#start/env'
 
 interface UserInfoInterface {
-  userId?: string
-  username?: string
-  email?: string
+  id: string
+  username: string
+  email: string
 }
 
 export class UserInfo implements UserInfoInterface {
-  userId?: string
-  username?: string
-  email?: string
+  id: string
+  username: string
+  email: string
 
   constructor(info: UserInfoInterface) {
-    Object.assign(this, info)
+    this.id = info.id
+    this.username = info.username
+    this.email = info.email
   }
 }
 
@@ -39,10 +41,11 @@ export async function getUsername(token: string): Promise<UserInfo | null> {
     const res = await fetch(`${env.get('AUTH_SERVICE_URL')}/api/v1/account/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-    console.log('Fetching username with token:', res)
     if (!res.ok) return null
-    const body = (await res.json()) as { data: UserInfoInterface }
-    return new UserInfo(body.data)
+    const body = (await res.json()) as { data: { id: string; fullName: string; email: string } }
+    console.log('Fetched user info:', body.data)
+    body.data.fullName = body.data.fullName.replace(/\s+/g, '-') // Replace spaces with hyphens
+    return new UserInfo({ id: body.data.id, username: body.data.fullName, email: body.data.email })
   } catch (error) {
     console.log('Error fetching username', error)
     return null
