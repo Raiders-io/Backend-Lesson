@@ -29,7 +29,7 @@ export class LessonOperations {
       const event: LessonCreatedEvent = {
         payload: {
           lessonId: lessonId,
-          authorId: lessonModel.authorId,
+          authorId: lessonModel.author,
         },
         type: 'lesson.created',
       }
@@ -53,8 +53,8 @@ export class LessonOperations {
     publish(STREAM_NAME, event, PublishOptions)
   }
 
-  async deleteLessonsByAuthorId(authorId: string) {
-    const lessons = await LessonHeader.findManyBy('authorId', authorId)
+  async deleteLessonsByauthor(author: string) {
+    const lessons = await LessonHeader.findManyBy('author', author)
     if (!lessons || lessons.length === 0) return
     await db.transaction(async (trx) => {
       for (const lesson of lessons) {
@@ -76,13 +76,10 @@ export class LessonOperations {
   async updateLesson(lesson: LessonHeader, title?: string, tags?: number[], privacy?: boolean) {
     lesson.title = title ?? lesson.title
     if (title) {
-      lesson.slug =
-        lesson.slug.split('/')[0] +
-        '/' +
-        title
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^a-z0-9-]/g, '')
+      lesson.slug = title
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
     }
     lesson.isPrivate = privacy ?? lesson.isPrivate
     const currTags = tags ?? Array.from(lesson.tags, (tag) => tag.id)
@@ -99,6 +96,27 @@ export class LessonOperations {
       type: 'lesson.updated',
     }
     publish(STREAM_NAME, event, PublishOptions)
+  }
+
+  async getLessonByAuthor(author: string) {
+    const lessons = await LessonHeader.findManyBy('author', author)
+    return lessons
+  }
+
+  async getLessonByAuthorAndContent(author: string, contentId: string) {
+    const lessons = await LessonHeader.findManyBy('author', author)
+    const lesson = lessons.find((content) => content.slug === contentId)
+    return lesson
+  }
+
+  async getLessonById(lessonId: string) {
+    const lesson = await LessonHeader.findBy('lessonId', lessonId)
+    return lesson
+  }
+
+  async getLessonByAuthorID(authorId: string) {
+    const lessons = await LessonHeader.findManyBy('authorId', authorId)
+    return lessons
   }
 }
 

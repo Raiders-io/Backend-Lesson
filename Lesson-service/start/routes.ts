@@ -15,8 +15,18 @@ router
   .group(() => {
     router.get('/lessons/tags', [controllers.Lessons, 'showTags'])
 
-    router.resource('lessons', controllers.Lessons).apiOnly().use('*', middleware.verifyToken())
-
+    router.group(() => {
+      router.get('lessons', [controllers.Lessons, 'index'])
+      router.get('lessons/:author', [controllers.Lessons, 'showByAuthor'])
+      router.get('lessons/:author/:contentId', [controllers.Lessons, 'show'])
+      router.post('lessons', [controllers.Lessons, 'store']).middleware([middleware.verifyToken()])
+      router
+        .put('lessons/:contentId', [controllers.Lessons, 'update'])
+        .middleware([middleware.verifyToken()])
+      router
+        .delete('lessons/:contentId', [controllers.Lessons, 'destroy'])
+        .middleware([middleware.verifyToken()])
+    })
     router
       .group(() => {
         router.get('/files/:fileId', [controllers.Files, 'show'])
