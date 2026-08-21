@@ -43,13 +43,13 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
-export class FileSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'lessonId', 'updatedAt'] as const
-  $columns = FileSchema.$columns
+export class LessonFileSchema extends BaseModel {
+  static $columns = ['createdAt', 'fileId', 'lessonId', 'updatedAt'] as const
+  $columns = LessonFileSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
   @column({ isPrimary: true })
-  declare id: string
+  declare fileId: string
   @column()
   declare lessonId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -62,7 +62,6 @@ export class LessonHeaderSchema extends BaseModel {
     'authorId',
     'createdAt',
     'description',
-    'id',
     'isPrivate',
     'lessonId',
     'pertinence',
@@ -79,8 +78,6 @@ export class LessonHeaderSchema extends BaseModel {
   declare createdAt: DateTime | null
   @column()
   declare description: string | null
-  @column()
-  declare id: number
   @column()
   declare isPrivate: boolean
   @column({ isPrimary: true })
