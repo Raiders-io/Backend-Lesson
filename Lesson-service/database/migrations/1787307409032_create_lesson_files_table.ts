@@ -1,11 +1,11 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'files'
+  protected tableName = 'lesson_files'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique()
+      table.string('file_id').notNullable()
       table
         .uuid('lesson_id')
         .notNullable()
@@ -13,6 +13,7 @@ export default class extends BaseSchema {
         .inTable('lesson_headers')
         .onDelete('CASCADE')
 
+      table.primary(['file_id', 'lesson_id'])
       table.timestamp('created_at')
       table.timestamp('updated_at')
     })

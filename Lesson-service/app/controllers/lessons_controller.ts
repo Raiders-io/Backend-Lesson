@@ -3,8 +3,7 @@ import LessonHeader from '#models/lesson_header'
 import Tag from '#models/tag'
 import LessonOperations from '#service/lesson'
 import { getUsername } from '#middleware/verify_token_middleware'
-import type { UserInfo } from '#middleware/verify_token_middleware'
-import type { LessonDataInterface } from '#service/lesson'
+import type { UserInfo, LessonDataInterface } from '#types'
 
 export default class LessonsController {
   /**

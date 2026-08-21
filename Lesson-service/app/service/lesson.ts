@@ -1,6 +1,8 @@
 import LessonHeader from '#models/lesson_header'
 import db from '@adonisjs/lucid/services/db'
 import { publish } from '@yosone/broker'
+import { STREAM_NAME } from '#types'
+import type { LessonDataInterface } from '#types'
 import type {
   LessonCreatedEvent,
   LessonDeletedEvent,
@@ -8,21 +10,13 @@ import type {
   PublishOptions,
 } from '@yosone/broker'
 
-const STREAM_NAME: string = 'lesson.service'
-
 const PublishOptions: PublishOptions = {
   retry: 3,
   retryTime: 10000,
 }
 
-export interface LessonDataInterface {
-  title?: string
-  tags?: number[]
-  privacy?: boolean
-  description?: string
-  username?: string
-}
-
+//TODO add check for privacy setting in all getter
+//TODO add preload for the file
 export class LessonOperations {
   async storeLesson(lessonModel: LessonHeader, tags: number[]) {
     const lessonId = await db.transaction(async (trx) => {
@@ -122,12 +116,12 @@ export class LessonOperations {
   }
 
   async getLessonByAuthor(author: string) {
-    const lessons = await LessonHeader.findManyBy('author', author)
+    const lessons = await LessonHeader.query().where('author', author).preload('tags')
     return lessons
   }
 
   async getLessonByAuthorAndContent(author: string, content: string) {
-    const lesson = await LessonHeader.query().where('author', author).where('slug', content)
+    const lesson = await LessonHeader.query().where('author', author).where('slug', content).preload('tags')
     return lesson
   }
 
@@ -139,6 +133,10 @@ export class LessonOperations {
   async getLessonByAuthorID(authorId: string) {
     const lessons = await LessonHeader.findManyBy('authorId', authorId)
     return lessons
+  }
+
+  async getLessonsByIds(lessonIds: string[]) {
+    return await LessonHeader.query().where('lesson_id', lessonIds)
   }
 }
 
