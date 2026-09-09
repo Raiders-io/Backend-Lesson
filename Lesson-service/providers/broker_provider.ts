@@ -34,7 +34,7 @@ export default class BrokerProvider {
     consume('auth.service')
       .on('auth.user.deleted', async (event) => {
         const authorId: string = event.payload.userId
-        if (authorId) await LessonOperations.deleteLessonsByAuthorId(authorId)
+        if (authorId) await LessonOperations.deleteLessonsByAuthor(authorId)
       })
       .on('auth.user.updated', () => {})
       .start()
