@@ -55,7 +55,7 @@ export class LessonOperations {
     publish(STREAM_NAME, event, PublishOptions)
   }
 
-  async deleteLessonsByauthor(author: string) {
+  async deleteLessonsByAuthor(author: string) {
     const lessons = await LessonHeader.findManyBy('author', author)
     if (!lessons || lessons.length === 0) return
     await db.transaction(async (trx) => {
@@ -121,7 +121,10 @@ export class LessonOperations {
   }
 
   async getLessonByAuthorAndContent(author: string, content: string) {
-    const lesson = await LessonHeader.query().where('author', author).where('slug', content).preload('tags')
+    const lesson = await LessonHeader.query()
+      .where('author', author)
+      .where('slug', content)
+      .preload('tags')
     return lesson
   }
 
@@ -130,7 +133,7 @@ export class LessonOperations {
     return lesson
   }
 
-  async getLessonByAuthorID(authorId: string) {
+  async getLessonByAuthorId(authorId: string) {
     const lessons = await LessonHeader.findManyBy('authorId', authorId)
     return lessons
   }
