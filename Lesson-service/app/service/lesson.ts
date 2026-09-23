@@ -43,10 +43,10 @@ export class LessonOperations {
   }
 
   async deleteLessonById(lessonId: string) {
-    const lesson = await LessonHeader.findBy('lessonId', lessonId)
+    const lesson = await LessonHeader.findBy('lesson_id', lessonId)
     if (!lesson) return
     await lesson.delete()
-    const event: LessonDeletedEvent = {
+    const event = {
       payload: {
         lessonId: lessonId,
       },
@@ -55,19 +55,16 @@ export class LessonOperations {
     publish(STREAM_NAME, event, PublishOptions)
   }
 
-  async deleteLessonsByAuthor(author: string) {
-    const lessons = await LessonHeader.findManyBy('author', author)
+  async deleteLessonsByAuthor(authorId: string) {
+    const lessons = await LessonHeader.query()
+      .where('author_id', authorId)
+      .delete()
+      .returning('lesson_id')
     if (!lessons || lessons.length === 0) return
-    await db.transaction(async (trx) => {
-      for (const lesson of lessons) {
-        lesson.useTransaction(trx)
-        await lesson.delete()
-      }
-    })
     for (const lesson of lessons) {
       const event: LessonDeletedEvent = {
         payload: {
-          lessonId: lesson.lessonId,
+          lessonId: lesson,
         },
         type: 'lesson.deleted',
       }
@@ -125,16 +122,17 @@ export class LessonOperations {
       .where('author', author)
       .where('slug', content)
       .preload('tags')
+      .first()
     return lesson
   }
 
   async getLessonById(lessonId: string) {
-    const lesson = await LessonHeader.findBy('lessonId', lessonId)
+    const lesson = await LessonHeader.findBy('lesson_id', lessonId)
     return lesson
   }
 
   async getLessonByAuthorId(authorId: string) {
-    const lessons = await LessonHeader.findManyBy('authorId', authorId)
+    const lessons = await LessonHeader.findManyBy('author_id', authorId)
     return lessons
   }
 

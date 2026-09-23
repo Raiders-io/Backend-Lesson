@@ -768,3 +768,12 @@ npm run typecheck
 
 - Kill process on port 3333: `lsof -ti:3333 | xargs kill -9`
 - Or change PORT in `.env`
+
+### TODO
+
+- Pass production build
+- finish controller for files
+- document routing
+- document event
+- Naming convention for event
+- Explain why groupName must NOT be identical

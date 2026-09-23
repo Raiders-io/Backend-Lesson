@@ -46,18 +46,12 @@ router
             router
               .delete('/:id', [controllers.Lessons, 'destroyById'])
               .middleware([middleware.verifyToken()])
+
+            router.get('/:id/files', [controllers.Files, 'index'])
+            router.post('/:id/files', [controllers.Files, 'store'])
+            router.put('/:id/files', [controllers.Files, 'update'])
           })
           .prefix('/byId')
-
-        router
-          .group(() => {
-            router.get('/files/:fileId', [controllers.Files, 'show'])
-            router.post('/files', [controllers.Files, 'store'])
-            router.put('/files/:fileId', [controllers.Files, 'update'])
-            router.delete('/files/:fileId', [controllers.Files, 'destroy'])
-          })
-          .prefix('/lesson/:id')
-          .use(middleware.verifyToken())
       })
       .prefix('/lessons')
     router.get('/search', [controllers.Searches, 'index'])
