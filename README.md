@@ -777,3 +777,67 @@ npm run typecheck
 - document event
 - Naming convention for event
 - Explain why groupName must NOT be identical
+
+## Event
+
+```ts
+export interface LessonCreatedEvent {
+  payload: {
+    lessonId: string;
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
+
+export interface LessonDeletedEvent {
+  payload: {
+    lessonId: string;
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
+
+export interface LessonUpdatedEvent {
+  payload: {
+    lessonId: string;
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
+
+export interface FileAttachedEvent {
+  payload: {
+    filename: string | string[];
+    lessonId: string;
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
+
+export interface FileDetachedEvent {
+  payload: {
+    filename: string;
+    lessonId: string | string[];
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
+
+export interface FileDeletedEvent {
+  payload: {
+    filename: string;
+    lessonId: string | string[];
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
+```
+
+verif file:
+/api/v1/storage/users/:userid/objects/search

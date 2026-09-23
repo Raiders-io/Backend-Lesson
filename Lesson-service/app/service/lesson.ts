@@ -3,12 +3,8 @@ import db from '@adonisjs/lucid/services/db'
 import { publish } from '@yosone/broker'
 import { STREAM_NAME } from '#types'
 import type { LessonDataInterface } from '#types'
-import type {
-  LessonCreatedEvent,
-  LessonDeletedEvent,
-  LessonUpdatedEvent,
-  PublishOptions,
-} from '@yosone/broker'
+import EventGenerator from '#service/event'
+import type { PublishOptions } from '@yosone/broker'
 
 const PublishOptions: PublishOptions = {
   retry: 3,
@@ -28,13 +24,7 @@ export class LessonOperations {
       return lesson.lessonId
     })
     try {
-      const event: LessonCreatedEvent = {
-        payload: {
-          lessonId: lessonId,
-          authorId: lessonModel.author,
-        },
-        type: 'lesson.created',
-      }
+      const event = EventGenerator.lessonCreated(lessonId, lessonModel.authorId)
       publish(STREAM_NAME, event, PublishOptions)
     } catch (error) {
       console.error('Error occurred while publishing lesson creation:', error)
@@ -46,12 +36,7 @@ export class LessonOperations {
     const lesson = await LessonHeader.findBy('lesson_id', lessonId)
     if (!lesson) return
     await lesson.delete()
-    const event = {
-      payload: {
-        lessonId: lessonId,
-      },
-      type: 'lesson.deleted',
-    }
+    const event = EventGenerator.lessonDeleted(lessonId, lesson.authorId)
     publish(STREAM_NAME, event, PublishOptions)
   }
 
@@ -62,12 +47,7 @@ export class LessonOperations {
       .returning('lesson_id')
     if (!lessons || lessons.length === 0) return
     for (const lesson of lessons) {
-      const event: LessonDeletedEvent = {
-        payload: {
-          lessonId: lesson,
-        },
-        type: 'lesson.deleted',
-      }
+      const event = EventGenerator.lessonDeleted(lesson.lesson_id, authorId)
       publish(STREAM_NAME, event, PublishOptions)
     }
   }
@@ -103,12 +83,7 @@ export class LessonOperations {
       await lesson.save()
       await lesson.related('tags').sync(currTags)
     })
-    const event: LessonUpdatedEvent = {
-      payload: {
-        lessonId: lesson.lessonId,
-      },
-      type: 'lesson.updated',
-    }
+    const event = EventGenerator.lessonUpdated(lesson.lessonId, lesson.authorId)
     publish(STREAM_NAME, event, PublishOptions)
   }
 
