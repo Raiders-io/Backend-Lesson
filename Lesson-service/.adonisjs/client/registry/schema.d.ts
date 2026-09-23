@@ -1,178 +1,240 @@
 /* eslint-disable prettier/prettier */
 /// <reference path="../manifest.d.ts" />
 
-import type { ExtractBody, ExtractErrorResponse, ExtractQuery, ExtractQueryForGet, ExtractResponse } from '@tuyau/core/types'
+import type {
+  ExtractBody,
+  ExtractErrorResponse,
+  ExtractQuery,
+  ExtractQueryForGet,
+  ExtractResponse,
+} from '@tuyau/core/types'
 import type { InferInput, SimpleError } from '@vinejs/vine/types'
 
 export type ParamValue = string | number | bigint | boolean
 
 export interface Registry {
   'lessons.show_tags': {
-    methods: ["GET","HEAD"]
+    methods: ['GET', 'HEAD']
     pattern: '/api/v1/lessons/tags'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showTags']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showTags']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['showTags']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['showTags']>>
+      >
     }
   }
   'lessons.index': {
-    methods: ["GET","HEAD"]
+    methods: ['GET', 'HEAD']
     pattern: '/api/v1/lessons'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['index']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['index']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['index']>>
+      >
     }
   }
   'lessons.store': {
-    methods: ["POST"]
+    methods: ['POST']
     pattern: '/api/v1/lessons'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['store']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['store']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['store']>>
+      >
     }
   }
   'lessons.show_by_author': {
-    methods: ["GET","HEAD"]
+    methods: ['GET', 'HEAD']
     pattern: '/api/v1/lessons/cnt/:author'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { author: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByAuthor']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByAuthor']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['showByAuthor']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['showByAuthor']>>
+      >
     }
   }
   'lessons.show_by_content': {
-    methods: ["GET","HEAD"]
+    methods: ['GET', 'HEAD']
     pattern: '/api/v1/lessons/cnt/:author/:content'
     types: {
       body: {}
       paramsTuple: [ParamValue, ParamValue]
       params: { author: ParamValue; content: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByContent']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showByContent']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['showByContent']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['showByContent']>>
+      >
     }
   }
   'lessons.update_by_content': {
-    methods: ["PUT"]
+    methods: ['PUT']
     pattern: '/api/v1/lessons/cnt/:author/:content'
     types: {
       body: {}
       paramsTuple: [ParamValue, ParamValue]
       params: { author: ParamValue; content: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['updateByContent']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['updateByContent']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['updateByContent']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['updateByContent']>>
+      >
     }
   }
   'lessons.destroy_by_content': {
-    methods: ["DELETE"]
+    methods: ['DELETE']
     pattern: '/api/v1/lessons/cnt/:author/:content'
     types: {
       body: {}
       paramsTuple: [ParamValue, ParamValue]
       params: { author: ParamValue; content: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['destroyByContent']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['destroyByContent']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['destroyByContent']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['destroyByContent']>>
+      >
     }
   }
   'lessons.show_by_id': {
-    methods: ["GET","HEAD"]
+    methods: ['GET', 'HEAD']
     pattern: '/api/v1/lessons/byId/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showById']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['showById']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['showById']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['showById']>>
+      >
     }
   }
   'lessons.update_by_id': {
-    methods: ["PUT"]
+    methods: ['PUT']
     pattern: '/api/v1/lessons/byId/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['updateById']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['updateById']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['updateById']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['updateById']>>
+      >
     }
   }
   'lessons.destroy_by_id': {
-    methods: ["DELETE"]
+    methods: ['DELETE']
     pattern: '/api/v1/lessons/byId/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['destroyById']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/lessons_controller').default['destroyById']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['destroyById']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/lessons_controller').default['destroyById']>>
+      >
     }
   }
   'files.index': {
-    methods: ["GET","HEAD"]
+    methods: ['GET', 'HEAD']
     pattern: '/api/v1/lessons/byId/:id/files'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/files_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/files_controller').default['index']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/files_controller').default['index']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/files_controller').default['index']>>
+      >
     }
   }
   'files.store': {
-    methods: ["POST"]
+    methods: ['POST']
     pattern: '/api/v1/lessons/byId/:id/files'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/files_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/files_controller').default['store']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/files_controller').default['store']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/files_controller').default['store']>>
+      >
     }
   }
   'files.update': {
-    methods: ["PUT"]
+    methods: ['PUT']
     pattern: '/api/v1/lessons/byId/:id/files'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/files_controller').default['update']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/files_controller').default['update']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/files_controller').default['update']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/files_controller').default['update']>>
+      >
     }
   }
   'searches.index': {
-    methods: ["GET","HEAD"]
+    methods: ['GET', 'HEAD']
     pattern: '/api/v1/search'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/searches_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/searches_controller').default['index']>>>
+      response: ExtractResponse<
+        Awaited<ReturnType<import('#controllers/searches_controller').default['index']>>
+      >
+      errorResponse: ExtractErrorResponse<
+        Awaited<ReturnType<import('#controllers/searches_controller').default['index']>>
+      >
     }
   }
 }

@@ -10,6 +10,7 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import { verify } from 'node:crypto'
 
 router
   .group(() => {
@@ -19,19 +20,14 @@ router
 
         router.group(() => {
           router.get('/', [controllers.Lessons, 'index'])
-          router.post('/', [controllers.Lessons, 'store']).middleware([middleware.verifyToken()])
+          router.post('/', [controllers.Lessons, 'store'])
 
           router
             .group(() => {
               router.get('/:author', [controllers.Lessons, 'showByAuthor'])
               router.get('/:author/:content', [controllers.Lessons, 'showByContent'])
-              router
-                .put('/:author/:content', [controllers.Lessons, 'updateByContent'])
-                .middleware([middleware.verifyToken()])
-
-              router
-                .delete('/:author/:content', [controllers.Lessons, 'destroyByContent'])
-                .middleware([middleware.verifyToken()])
+              router.put('/:author/:content', [controllers.Lessons, 'updateByContent'])
+              router.delete('/:author/:content', [controllers.Lessons, 'destroyByContent'])
             })
             .prefix('/cnt')
         })
@@ -40,20 +36,29 @@ router
           .group(() => {
             router.get('/:id', [controllers.Lessons, 'showById'])
 
-            router
-              .put('/:id', [controllers.Lessons, 'updateById'])
-              .middleware([middleware.verifyToken()])
-            router
-              .delete('/:id', [controllers.Lessons, 'destroyById'])
-              .middleware([middleware.verifyToken()])
+            router.put('/:id', [controllers.Lessons, 'updateById'])
+            router.delete('/:id', [controllers.Lessons, 'destroyById'])
 
-            router.get('/:id/files', [controllers.Files, 'index'])
-            router.post('/:id/files', [controllers.Files, 'store'])
-            router.put('/:id/files', [controllers.Files, 'update'])
+            router
+              .group(() => {
+                router.get('/', [controllers.Files, 'index'])
+                router.post('/', [controllers.Files, 'store'])
+                router.put('/', [controllers.Files, 'update'])
+                router.delete('/', [controllers.Files, 'destroy'])
+                router.get('/:file', [controllers.Files, 'show'])
+              })
+              .prefix('/:id/files')
           })
           .prefix('/byId')
+        router
+          .group(() => {
+            router.delete('/:file', [controllers.Files, 'destroyByFile'])
+            router.get('/:file', [controllers.Files, 'showLessons'])
+          })
+          .prefix('/file')
       })
       .prefix('/lessons')
     router.get('/search', [controllers.Searches, 'index'])
   })
   .prefix('/api/v1')
+  .middleware([middleware.verifyToken()])

@@ -5,89 +5,60 @@ import type { PublishOptions } from '@yosone/broker'
 import { STREAM_NAME } from '#types'
 import LessonFile from '#models/lesson_file'
 import LessonOperations from '#service/lesson'
-import lesson from '#service/lesson'
+import EventGenerator from '#service/event'
 
 //TODO check if deletion success before publish
-const service = 'lesson'
 const PublishOpt: PublishOptions = {
   retry: 3,
   retryTime: 1000,
 }
 
 class FileOperation {
-  async attach(fileModel: File, lessonId: string) {
-    await db.transaction(async (trx) => {
-      fileModel.useTransaction(trx)
-      fileModel.lessonId = lessonId
-      await fileModel.save()
-    })
-    publish(
-      STREAM_NAME,
-      {
-        type: 'file.attached',
-        payload: {
-          fileId: fileModel.fileId,
-          lessonId: fileModel.lessonId,
-        },
-      },
-      PublishOpt
-    )
-  }
+  async attach(filenames: string[], lessonId: string) {
+    const lesson = await LessonOperations.getLessonById(lessonId)
+    if (!lesson) return
 
-  async attachMultiple(fileModels: File[], lessonId: string) {
-    await db.transaction(async (trx) => {
-      for (const fileModel of fileModels) {
-        fileModel.useTransaction(trx)
-        fileModel.lessonId = lessonId
-        await fileModel.save()
-      }
-    })
-    const payload = fileModels.map((fileModel) => ({
-      fileId: fileModel.fileId,
-      lessonId: fileModel.lessonId,
+    const payload = filenames.map((filename) => ({
+      filename,
+      lessonId,
     }))
-    publish(
-      STREAM_NAME,
-      {
-        type: 'file.attached',
-        payload: payload,
-      },
-      PublishOpt
-    )
-  }
 
-  async detach(fileId: string, lessonId: string) {
-    await LessonFile.query().where('file_id', fileId).where('lesson_id', lessonId).delete()
-
-    publish(STREAM_NAME, {
-      type: 'file.detached',
-      payload: {
-        fileId: fileId,
-        lessonId: lessonId,
-      },
+    const record = await db.transaction(async (trx) => {
+      return await LessonFile.createMany(payload, { client: trx })
     })
+
+    const event = EventGenerator.fileAttached(filenames, lessonId, lesson.authorId)
+    publish(STREAM_NAME, event, PublishOpt)
+    return record
   }
 
-  async delete(fileId: string) {
-    const lessonIds = await LessonFile.query()
-      .where('file_id', fileId)
+  async detach(filenames: string[], lessonId: string) {
+    const lesson = await LessonOperations.getLessonById(lessonId)
+    if (!lesson) return
+
+    await LessonFile.query().whereIn('filename', filenames).where('lesson_id', lessonId).delete()
+
+    const event = EventGenerator.fileDetached(filenames, lessonId, lesson.authorId)
+    publish(STREAM_NAME, event, PublishOpt)
+  }
+
+  async delete(filename: string, userId: string) {
+    const matches = await LessonFile.query()
+      .where('filename', filename)
+      .whereHas('LessonHeader', (query) => {
+        query.where('author_id', userId)
+      })
       .delete()
       .returning('lesson_id')
+
+    if (!matches || matches.length === 0) return
+    const lessonIds = matches.map((match) => match.lessonId)
+
     // const lessonIds = Array.from(files, (file) => file.lessonId)
     // await LessonFile.query().where('file_id', fileId).delete()
 
-    if (!lessonIds || lessonIds.length === 0) return
-    publish(
-      STREAM_NAME,
-      {
-        type: `${service}.file.deleted`,
-        payload: {
-          fileId: fileId,
-          lessonId: lessonIds,
-        },
-      },
-      PublishOpt
-    )
+    const event = EventGenerator.fileDeleted(filename, lessonIds, userId)
+    publish(STREAM_NAME, event, PublishOpt)
   }
 
   async getByLessonId(lessonId: string) {
@@ -95,12 +66,19 @@ class FileOperation {
     return files
   }
 
-  async getByFileId(fileId: string) {
-    return await LessonFile.query().where('file_id', fileId)
+  async getByFile(filename: string) {
+    return await LessonFile.query().where('filename', filename)
   }
 
-  async getRelatedLesson(fileId: string) {
-    const files = await LessonFile.query().where('file_id', fileId)
+  async getByLessonIdAndFile(filename: string, lessonId: string) {
+    return await LessonFile.query()
+      .where('filename', filename)
+      .andWhere('lesson_id', lessonId)
+      .first()
+  }
+
+  async getRelatedLesson(filename: string) {
+    const files = await LessonFile.query().where('filename', filename)
     const ids = Array.from(files, (file) => file.lessonId)
     return await LessonOperations.getLessonsByIds(ids)
   }

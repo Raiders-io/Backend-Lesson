@@ -3,23 +3,23 @@ import type { routes } from './index.ts'
 
 export interface ApiDefinition {
   lessons: {
-    showTags: typeof routes['lessons.show_tags']
-    index: typeof routes['lessons.index']
-    store: typeof routes['lessons.store']
-    showByAuthor: typeof routes['lessons.show_by_author']
-    showByContent: typeof routes['lessons.show_by_content']
-    updateByContent: typeof routes['lessons.update_by_content']
-    destroyByContent: typeof routes['lessons.destroy_by_content']
-    showById: typeof routes['lessons.show_by_id']
-    updateById: typeof routes['lessons.update_by_id']
-    destroyById: typeof routes['lessons.destroy_by_id']
+    showTags: (typeof routes)['lessons.show_tags']
+    index: (typeof routes)['lessons.index']
+    store: (typeof routes)['lessons.store']
+    showByAuthor: (typeof routes)['lessons.show_by_author']
+    showByContent: (typeof routes)['lessons.show_by_content']
+    updateByContent: (typeof routes)['lessons.update_by_content']
+    destroyByContent: (typeof routes)['lessons.destroy_by_content']
+    showById: (typeof routes)['lessons.show_by_id']
+    updateById: (typeof routes)['lessons.update_by_id']
+    destroyById: (typeof routes)['lessons.destroy_by_id']
   }
   files: {
-    index: typeof routes['files.index']
-    store: typeof routes['files.store']
-    update: typeof routes['files.update']
+    index: (typeof routes)['files.index']
+    store: (typeof routes)['files.store']
+    update: (typeof routes)['files.update']
   }
   searches: {
-    index: typeof routes['searches.index']
+    index: (typeof routes)['searches.index']
   }
 }
