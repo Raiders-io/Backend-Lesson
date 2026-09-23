@@ -14,10 +14,9 @@ export type ScannedRoutes = {
     'lessons.show_by_id': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'lessons.update_by_id': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'lessons.destroy_by_id': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'files.show': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'fileId': ParamValue} }
+    'files.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'files.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'files.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'fileId': ParamValue} }
-    'files.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'fileId': ParamValue} }
+    'files.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'searches.index': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -26,7 +25,7 @@ export type ScannedRoutes = {
     'lessons.show_by_author': { paramsTuple: [ParamValue]; params: {'author': ParamValue} }
     'lessons.show_by_content': { paramsTuple: [ParamValue,ParamValue]; params: {'author': ParamValue,'content': ParamValue} }
     'lessons.show_by_id': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'files.show': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'fileId': ParamValue} }
+    'files.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'searches.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -35,7 +34,7 @@ export type ScannedRoutes = {
     'lessons.show_by_author': { paramsTuple: [ParamValue]; params: {'author': ParamValue} }
     'lessons.show_by_content': { paramsTuple: [ParamValue,ParamValue]; params: {'author': ParamValue,'content': ParamValue} }
     'lessons.show_by_id': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'files.show': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'fileId': ParamValue} }
+    'files.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'searches.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
@@ -45,12 +44,11 @@ export type ScannedRoutes = {
   PUT: {
     'lessons.update_by_content': { paramsTuple: [ParamValue,ParamValue]; params: {'author': ParamValue,'content': ParamValue} }
     'lessons.update_by_id': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'files.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'fileId': ParamValue} }
+    'files.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'lessons.destroy_by_content': { paramsTuple: [ParamValue,ParamValue]; params: {'author': ParamValue,'content': ParamValue} }
     'lessons.destroy_by_id': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'files.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'fileId': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

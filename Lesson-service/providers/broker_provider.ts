@@ -1,6 +1,7 @@
 import type { ApplicationService } from '@adonisjs/core/types'
 import { Broker, consume } from '@yosone/broker'
 import LessonOperations from '#service/lesson'
+import { LOGLEVEL } from '@yosone/broker'
 
 export default class BrokerProvider {
   constructor(protected app: ApplicationService) {}
@@ -28,16 +29,21 @@ export default class BrokerProvider {
       group: 'lesosn-service',
       consumer: 'lesson-consumer',
       redisUrl: 'redis://redis:6379',
-      logLevel: 4,
+      logLevel: LOGLEVEL.INFO,
     })
 
-    consume('auth.service')
-      .on('auth.user.deleted', async (event) => {
-        const authorId: string = event.payload.userId
-        if (authorId) await LessonOperations.deleteLessonsByAuthor(authorId)
-      })
-      .on('auth.user.updated', () => {})
-      .start()
+    const authConsumer = consume('auth.events')
+
+    authConsumer.on('auth.user.deleted', async (event) => {
+      const authorId: string = event.payload.userId
+      if (authorId) await LessonOperations.deleteLessonsByAuthor(authorId)
+    })
+
+    authConsumer.on('auth.user.updated', async (event) => {
+      console.log('auth.user.updated event received', event)
+    })
+
+    authConsumer.start()
   }
 
   /**

@@ -5,7 +5,10 @@ import type { PublishOptions } from '@yosone/broker'
 import { STREAM_NAME } from '#types'
 import LessonFile from '#models/lesson_file'
 import LessonOperations from '#service/lesson'
+import lesson from '#service/lesson'
 
+//TODO check if deletion success before publish
+const service = 'lesson'
 const PublishOpt: PublishOptions = {
   retry: 3,
   retryTime: 1000,
@@ -18,17 +21,43 @@ class FileOperation {
       fileModel.lessonId = lessonId
       await fileModel.save()
     })
-    publish(STREAM_NAME, {
-      type: 'file.attached',
-      payload: {
-        fileId: fileModel.fileId,
-        lessonId: fileModel.lessonId,
+    publish(
+      STREAM_NAME,
+      {
+        type: 'file.attached',
+        payload: {
+          fileId: fileModel.fileId,
+          lessonId: fileModel.lessonId,
+        },
       },
+      PublishOpt
+    )
+  }
+
+  async attachMultiple(fileModels: File[], lessonId: string) {
+    await db.transaction(async (trx) => {
+      for (const fileModel of fileModels) {
+        fileModel.useTransaction(trx)
+        fileModel.lessonId = lessonId
+        await fileModel.save()
+      }
     })
+    const payload = fileModels.map((fileModel) => ({
+      fileId: fileModel.fileId,
+      lessonId: fileModel.lessonId,
+    }))
+    publish(
+      STREAM_NAME,
+      {
+        type: 'file.attached',
+        payload: payload,
+      },
+      PublishOpt
+    )
   }
 
   async detach(fileId: string, lessonId: string) {
-    await LessonFile.query().where({ file_id: fileId, lesson_id: lessonId }).delete()
+    await LessonFile.query().where('file_id', fileId).where('lesson_id', lessonId).delete()
 
     publish(STREAM_NAME, {
       type: 'file.detached',
@@ -40,14 +69,18 @@ class FileOperation {
   }
 
   async delete(fileId: string) {
-    const files = await LessonFile.query().where('fileId', fileId)
-    const lessonIds = Array.from(files, (file) => file.lessonId)
-    await LessonFile.query().where('fileId', fileId).delete()
+    const lessonIds = await LessonFile.query()
+      .where('file_id', fileId)
+      .delete()
+      .returning('lesson_id')
+    // const lessonIds = Array.from(files, (file) => file.lessonId)
+    // await LessonFile.query().where('file_id', fileId).delete()
 
+    if (!lessonIds || lessonIds.length === 0) return
     publish(
       STREAM_NAME,
       {
-        type: 'file.deleted',
+        type: `${service}.file.deleted`,
         payload: {
           fileId: fileId,
           lessonId: lessonIds,

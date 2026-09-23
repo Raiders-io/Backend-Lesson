@@ -19,4 +19,5 @@ npm run seed
 
 # Start the server
 echo "Starting the server..."
+# exec npm run start
 exec npm run dev

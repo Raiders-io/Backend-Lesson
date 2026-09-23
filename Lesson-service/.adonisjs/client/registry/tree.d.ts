@@ -15,10 +15,9 @@ export interface ApiDefinition {
     destroyById: typeof routes['lessons.destroy_by_id']
   }
   files: {
-    show: typeof routes['files.show']
+    index: typeof routes['files.index']
     store: typeof routes['files.store']
     update: typeof routes['files.update']
-    destroy: typeof routes['files.destroy']
   }
   searches: {
     index: typeof routes['searches.index']

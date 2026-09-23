@@ -19,7 +19,7 @@ export default class LessonsController {
    */
   async showByContent({ params, response }: HttpContext) {
     const lesson = await LessonOperations.getLessonByAuthorAndContent(params.author, params.content)
-    if (!lesson || lesson.length === 0) {
+    if (!lesson) {
       return response.notFound({ error: 'Lesson not found' })
     }
     return response.ok(lesson)
