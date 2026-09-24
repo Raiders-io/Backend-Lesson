@@ -5,7 +5,7 @@ import type {
   LessonCreatedEvent,
   LessonDeletedEvent,
   LessonUpdatedEvent,
-} from '#types'
+} from '#utils/types'
 
 const service = 'lesson'
 

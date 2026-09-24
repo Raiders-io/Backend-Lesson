@@ -3,7 +3,8 @@ import LessonHeader from '#models/lesson_header'
 import Tag from '#models/tag'
 import LessonOperations from '#service/lesson'
 import { getUsername } from '#middleware/verify_token_middleware'
-import type { UserInfo, LessonDataInterface } from '#types'
+import type { UserInfo, LessonDataInterface } from '#utils/types'
+import { ErrorMessage } from '#utils/message'
 
 export default class LessonsController {
   /**
@@ -20,7 +21,7 @@ export default class LessonsController {
   async showByContent({ params, response }: HttpContext) {
     const lesson = await LessonOperations.getLessonByAuthorAndContent(params.author, params.content)
     if (!lesson) {
-      return response.notFound({ error: 'Lesson not found' })
+      return response.notFound(ErrorMessage.Lessons.NotFound)
     }
     return response.ok(lesson)
   }
@@ -35,7 +36,7 @@ export default class LessonsController {
     const lessons = await LessonOperations.getLessonByAuthor(authorId)
 
     if (!lessons || lessons.length === 0) {
-      return response.notFound({ error: 'No lessons found for the given author' })
+      return response.notFound(ErrorMessage.Lessons.NotFoundAuthor)
     }
     return response.ok(lessons)
   }
@@ -57,7 +58,7 @@ export default class LessonsController {
     const lesson = await LessonOperations.getLessonById(params.id)
     console.log('params.id', params.id)
     if (!lesson) {
-      return response.notFound({ error: 'Lesson not found' })
+      return response.notFound(ErrorMessage.Lessons.NotFound)
     }
     return response.ok(lesson)
   }
@@ -78,17 +79,16 @@ export default class LessonsController {
       request.header('authorization')?.replace('Bearer ', '') ?? ''
     )
 
-    if (!userId) return response.unauthorized({ error: 'Unauthorized to create a lesson' })
+    if (!userId) return response.unauthorized(ErrorMessage.User.Logout)
 
-    if (!userInfo)
-      return response.badRequest({ error: 'Unable to fetch user info for the given userId' })
+    if (!userInfo) return response.internalServerError(ErrorMessage.User.Fetch)
 
     if (!lessonDataInterface.title) {
-      return response.badRequest({ error: 'Title is required' })
+      return response.badRequest({ error: ErrorMessage.Lessons.NoTitle })
     }
 
     if (!Array.isArray(lessonDataInterface.tags) || lessonDataInterface.tags.length === 0) {
-      return response.badRequest({ error: 'At least one tag is required' })
+      return response.badRequest(ErrorMessage.Lessons.NoTags)
     }
 
     const slug = lessonDataInterface.title
@@ -103,7 +103,7 @@ export default class LessonsController {
       .where('slug', slug)
       .first()
     if (query) {
-      return response.badRequest({ error: 'A lesson with the same title already exists' })
+      return response.conflict(ErrorMessage.Lessons.Collision)
     }
 
     lessonModel.title = lessonDataInterface.title
@@ -128,21 +128,22 @@ export default class LessonsController {
       .where('slug', params.content)
       .first()
     if (!lesson) {
-      return response.notFound({ error: 'Lesson not found' })
+      return response.notFound(ErrorMessage.Lessons.NotFound)
     }
 
     const authorId = request.ctx?.userId
-    if (!authorId || lesson.authorId !== authorId) {
-      return response.forbidden({ error: 'Unauthorized to update this lesson' })
-    }
+    if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
+    if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
     const lessonDataInterface = request.only(['title', 'tags', 'description', 'privacy'])
     try {
       await LessonOperations.updateLesson(lesson, lessonDataInterface)
     } catch (error) {
-      return response.badRequest({ error: 'Failed to update lesson' })
+      return response.badRequest(
+        error instanceof Error ? { error: error.message } : { error: 'Failed to update lesson' }
+      )
     }
-    return response.ok({ message: 'Lesson updated successfully' })
+    return response.ok(ErrorMessage.Lessons.Ok)
   }
   /**
    * Handle form submission for the edit action
@@ -151,9 +152,8 @@ export default class LessonsController {
     const lesson = await LessonHeader.findOrFail(params.id)
 
     const authorId = request.ctx?.userId
-    if (!authorId || lesson.authorId !== authorId) {
-      return response.forbidden({ error: 'Unauthorized to update this lesson' })
-    }
+    if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
+    if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
     const lessonUpdateData: LessonDataInterface = request.only([
       'title',
@@ -166,9 +166,11 @@ export default class LessonsController {
     try {
       await LessonOperations.updateLesson(lesson, lessonUpdateData)
     } catch (error) {
-      return response.badRequest({ error: 'Failed to update lesson' })
+      return response.badRequest(
+        error instanceof Error ? { error: error.message } : { error: 'Failed to update lesson' }
+      )
     }
-    return response.ok({ message: 'Lesson updated successfully' })
+    return response.ok(ErrorMessage.Lessons.Ok)
   }
 
   /**
@@ -178,12 +180,11 @@ export default class LessonsController {
     const lesson = await LessonHeader.findOrFail(params.id)
 
     const authorId = request.ctx?.userId
-    if (lesson.authorId !== authorId) {
-      return response.badRequest({ error: 'Unauthorized to delete this lesson' })
-    }
+    if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
+    if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
     await LessonOperations.deleteLessonById(lesson.lessonId)
-    return response.ok({ message: 'Lesson deleted successfully' })
+    return response.ok(ErrorMessage.Lessons.Ok)
   }
 
   async destroyByContent({ request, params, response }: HttpContext) {
@@ -192,15 +193,14 @@ export default class LessonsController {
       .where('content', params.content)
       .first()
     if (!lesson) {
-      return response.notFound({ error: 'Lesson not found' })
+      return response.notFound(ErrorMessage.Lessons.NotFound)
     }
 
     const authorId = request.ctx?.userId
-    if (!authorId || lesson.authorId !== authorId) {
-      return response.forbidden({ error: 'Unauthorized to delete this lesson' })
-    }
+    if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
+    if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
     await LessonOperations.deleteLessonById(lesson.lessonId)
-    return response.ok({ message: 'Lesson deleted successfully' })
+    return response.ok(ErrorMessage.Lessons.Ok)
   }
 }

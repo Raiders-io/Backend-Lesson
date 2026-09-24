@@ -1,4 +1,13 @@
+import env from '#start/env'
+import type { PublishOptions } from '@yosone/broker'
+
 export const STREAM_NAME: string = 'lesson.service'
+export const verifyRouteURL = `${env.get('FILE_SERVICE_URL')}${env.get('FILE_VERIFY_ROUTE_URL')}`
+
+export const PublishOpt: PublishOptions = {
+  retry: 3,
+  retryTime: 1000,
+}
 
 export interface UserInfoInterface {
   id: string
