@@ -1,15 +1,9 @@
 import LessonHeader from '#models/lesson_header'
 import db from '@adonisjs/lucid/services/db'
 import { publish } from '@yosone/broker'
-import { STREAM_NAME } from '#types'
-import type { LessonDataInterface } from '#types'
+import { STREAM_NAME, PublishOpt, type LessonDataInterface } from '#utils/types'
+import { ErrorMessage } from '#utils/message'
 import EventGenerator from '#service/event'
-import type { PublishOptions } from '@yosone/broker'
-
-const PublishOptions: PublishOptions = {
-  retry: 3,
-  retryTime: 10000,
-}
 
 //TODO add check for privacy setting in all getter
 //TODO add preload for the file
@@ -25,7 +19,7 @@ export class LessonOperations {
     })
     try {
       const event = EventGenerator.lessonCreated(lessonId, lessonModel.authorId)
-      publish(STREAM_NAME, event, PublishOptions)
+      publish(STREAM_NAME, event, PublishOpt)
     } catch (error) {
       console.error('Error occurred while publishing lesson creation:', error)
     }
@@ -37,7 +31,7 @@ export class LessonOperations {
     if (!lesson) return
     await lesson.delete()
     const event = EventGenerator.lessonDeleted(lessonId, lesson.authorId)
-    publish(STREAM_NAME, event, PublishOptions)
+    publish(STREAM_NAME, event, PublishOpt)
   }
 
   async deleteLessonsByAuthor(authorId: string) {
@@ -48,7 +42,7 @@ export class LessonOperations {
     if (!lessons || lessons.length === 0) return
     for (const lesson of lessons) {
       const event = EventGenerator.lessonDeleted(lesson.lesson_id, authorId)
-      publish(STREAM_NAME, event, PublishOptions)
+      publish(STREAM_NAME, event, PublishOpt)
     }
   }
 
@@ -68,7 +62,7 @@ export class LessonOperations {
       .first()
 
     if (duplicate) {
-      throw new Error('A lesson with the same title already exists')
+      throw new Error(ErrorMessage.Lessons.Collision)
     }
 
     lesson.isPrivate = lessonData.privacy ?? lesson.isPrivate
@@ -84,7 +78,7 @@ export class LessonOperations {
       await lesson.related('tags').sync(currTags)
     })
     const event = EventGenerator.lessonUpdated(lesson.lessonId, lesson.authorId)
-    publish(STREAM_NAME, event, PublishOptions)
+    publish(STREAM_NAME, event, PublishOpt)
   }
 
   async getLessonByAuthor(author: string) {

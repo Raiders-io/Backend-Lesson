@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import env from '#start/env'
-import { UserInfo } from '#types'
+import { UserInfo } from '#utils/types'
 
 async function verifyToken(token: string): Promise<string | null> {
   console.log('Fetching username with token:', token)

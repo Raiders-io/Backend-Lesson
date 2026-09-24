@@ -20,12 +20,16 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=$(openssl rand -base64 32 | tr -dc '[:alnum:]' | head -c 32)
 DB_DATABASE=lesson_service
-AUTH_SERVICE_URL=http://auth-service:3333
 
 # Message broker (Redis)
 GROUP="lesson-service"
 CONSUMER="lesson-service-consumer"
 REDIS_URL=redis://redis:6380
+
+# Services URLs
+FILE_SERVICE_URL=http://file-service:3333
+FILE_VERIFY_ROUTE_URL=/api/v1/storage/objects/search
+AUTH_SERVICE_URL=http://auth-service:3333
 
 #Flag
 NON_INTERACTIVE=false
@@ -49,6 +53,8 @@ DB_USER=${DB_USER}
 DB_PASSWORD=${DB_PASSWORD}
 DB_DATABASE=${DB_DATABASE}
 AUTH_SERVICE_URL=${AUTH_SERVICE_URL}
+FILE_SERVICE_URL=${FILE_SERVICE_URL}
+FILE_VERIFY_ROUTE_URL=${FILE_VERIFY_ROUTE_URL}
 eof
 }
 
@@ -68,12 +74,6 @@ generate_env() {
     elif [ "$choice" == "2" ]; then
         read -p "Enter PORT (default: 3333): " PORT
         PORT=${PORT:-3333}
-        # read -p "Enter DB_CONNECTION (default: pg): " DB_CONNECTION 
-        # DB_CONNECTION=${DB_CONNECTION:-pg}
-        # read -p "Enter DB_HOST (default: postgresql): " DB_HOST 
-        # DB_HOST=${DB_HOST:-postgresql}
-        # read -p "Enter DB_PORT (default: 5432): " DB_PORT
-        # DB_PORT=${DB_PORT:-5432}
         read -p "Enter DB_USER (default: postgres): " DB_USER
         DB_USER=${DB_USER:-postgres}
         read -p "Enter DB_PASSWORD (default: postgres): " DB_PASSWORD

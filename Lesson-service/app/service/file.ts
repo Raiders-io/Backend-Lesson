@@ -1,17 +1,9 @@
 import db from '@adonisjs/lucid/services/db'
-import type File from '#models/lesson_file'
 import { publish } from '@yosone/broker'
-import type { PublishOptions } from '@yosone/broker'
-import { STREAM_NAME } from '#types'
+import { STREAM_NAME, PublishOpt } from '#utils/types'
 import LessonFile from '#models/lesson_file'
 import LessonOperations from '#service/lesson'
 import EventGenerator from '#service/event'
-
-//TODO check if deletion success before publish
-const PublishOpt: PublishOptions = {
-  retry: 3,
-  retryTime: 1000,
-}
 
 class FileOperation {
   async attach(filenames: string[], lessonId: string) {
@@ -53,9 +45,6 @@ class FileOperation {
 
     if (!matches || matches.length === 0) return
     const lessonIds = matches.map((match) => match.lessonId)
-
-    // const lessonIds = Array.from(files, (file) => file.lessonId)
-    // await LessonFile.query().where('file_id', fileId).delete()
 
     const event = EventGenerator.fileDeleted(filename, lessonIds, userId)
     publish(STREAM_NAME, event, PublishOpt)
