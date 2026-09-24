@@ -7,6 +7,17 @@ import EventGenerator from '#service/event'
 
 //TODO add check for privacy setting in all getter
 //TODO add preload for the file
+function filterPrivate(lessons: LessonHeader[] | null, userId?: string) {
+  if (!lessons) return null
+  const filtered = lessons.filter((lesson) => !lesson.isPrivate || lesson.authorId === userId)
+  return filtered.length > 0 ? filtered : null
+}
+
+function isAccessble(lesson: LessonHeader | null, userId?: string) {
+  if (!lesson) return false
+  return !lesson.isPrivate || lesson.authorId === userId
+}
+
 export class LessonOperations {
   async storeLesson(lessonModel: LessonHeader, tags: number[]) {
     const lessonId = await db.transaction(async (trx) => {
@@ -81,32 +92,36 @@ export class LessonOperations {
     publish(STREAM_NAME, event, PublishOpt)
   }
 
-  async getLessonByAuthor(author: string) {
+  async getLessonByAuthor(author: string, userId?: string) {
     const lessons = await LessonHeader.query().where('author', author).preload('tags')
-    return lessons
+
+    return filterPrivate(lessons, userId)
   }
 
-  async getLessonByAuthorAndContent(author: string, content: string) {
+  async getLessonByAuthorAndContent(author: string, content: string, userId?: string) {
     const lesson = await LessonHeader.query()
       .where('author', author)
       .where('slug', content)
       .preload('tags')
       .first()
-    return lesson
+
+    return isAccessble(lesson, userId) ? lesson : null
   }
 
-  async getLessonById(lessonId: string) {
+  async getLessonById(lessonId: string, userId?: string) {
     const lesson = await LessonHeader.findBy('lesson_id', lessonId)
-    return lesson
+
+    return isAccessble(lesson, userId) ? lesson : null
   }
 
-  async getLessonByAuthorId(authorId: string) {
+  async getLessonByAuthorId(authorId: string, userId?: string) {
     const lessons = await LessonHeader.findManyBy('author_id', authorId)
-    return lessons
+
+    return filterPrivate(lessons, userId)
   }
 
-  async getLessonsByIds(lessonIds: string[]) {
-    return await LessonHeader.query().where('lesson_id', lessonIds)
+  async getLessonsByIds(lessonIds: string[], userId?: string) {
+    return filterPrivate(await LessonHeader.query().where('lesson_id', lessonIds), userId)
   }
 }
 

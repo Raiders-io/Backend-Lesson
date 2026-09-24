@@ -20,5 +20,6 @@ export const ErrorMessage = {
     NoTags: 'At least one tag is required',
     Collision: 'A lesson with the same title already exists for this author',
     Ok: 'Operation successful',
+    Private: 'This lesson is private and you do not have access',
   },
 } as const

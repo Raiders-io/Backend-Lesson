@@ -18,11 +18,16 @@ export default class LessonsController {
   /**
    * Show individual record
    */
-  async showByContent({ params, response }: HttpContext) {
-    const lesson = await LessonOperations.getLessonByAuthorAndContent(params.author, params.content)
+  async showByContent({ request, params, response }: HttpContext) {
+    const lesson = await LessonOperations.getLessonByAuthorAndContent(
+      params.author,
+      params.content,
+      request.ctx?.userId
+    )
     if (!lesson) {
       return response.notFound(ErrorMessage.Lessons.NotFound)
     }
+
     return response.ok(lesson)
   }
 
@@ -30,14 +35,15 @@ export default class LessonsController {
    * Show lessons by author
    *
    */
-  async showByAuthor({ params, response }: HttpContext) {
+  async showByAuthor({ request, params, response }: HttpContext) {
     const authorId = params.author
 
-    const lessons = await LessonOperations.getLessonByAuthor(authorId)
+    const lessons = await LessonOperations.getLessonByAuthor(authorId, request.ctx?.userId)
 
-    if (!lessons || lessons.length === 0) {
+    if (!lessons) {
       return response.notFound(ErrorMessage.Lessons.NotFoundAuthor)
     }
+
     return response.ok(lessons)
   }
 
@@ -54,9 +60,8 @@ export default class LessonsController {
   /**
    * Show individual record by ID
    */
-  async showById({ params, response }: HttpContext) {
-    const lesson = await LessonOperations.getLessonById(params.id)
-    console.log('params.id', params.id)
+  async showById({ request, params, response }: HttpContext) {
+    const lesson = await LessonOperations.getLessonById(params.id, request.ctx?.userId)
     if (!lesson) {
       return response.notFound(ErrorMessage.Lessons.NotFound)
     }
