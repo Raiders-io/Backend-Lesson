@@ -6,6 +6,5 @@
 export const controllers = {
   Files: () => import('#controllers/files_controller'),
   Lessons: () => import('#controllers/lessons_controller'),
-  Profile: () => import('#controllers/profile_controller'),
   Searches: () => import('#controllers/searches_controller'),
 }

@@ -7,42 +7,6 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
-export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = [
-    'abilities',
-    'createdAt',
-    'expiresAt',
-    'hash',
-    'id',
-    'lastUsedAt',
-    'name',
-    'tokenableId',
-    'type',
-    'updatedAt',
-  ] as const
-  $columns = AuthAccessTokenSchema.$columns
-  @column()
-  declare abilities: string
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime | null
-  @column.dateTime()
-  declare expiresAt: DateTime | null
-  @column()
-  declare hash: string
-  @column({ isPrimary: true })
-  declare id: number
-  @column.dateTime()
-  declare lastUsedAt: DateTime | null
-  @column()
-  declare name: string | null
-  @column()
-  declare tokenableId: number
-  @column()
-  declare type: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
 export class LessonFileSchema extends BaseModel {
   static $columns = ['createdAt', 'filename', 'lessonId', 'updatedAt'] as const
   $columns = LessonFileSchema.$columns
@@ -57,18 +21,7 @@ export class LessonFileSchema extends BaseModel {
 }
 
 export class LessonHeaderSchema extends BaseModel {
-  static $columns = [
-    'author',
-    'authorId',
-    'createdAt',
-    'description',
-    'isPrivate',
-    'lessonId',
-    'pertinence',
-    'slug',
-    'title',
-    'updatedAt',
-  ] as const
+  static $columns = ['author', 'authorId', 'createdAt', 'description', 'isPrivate', 'lessonId', 'pertinence', 'slug', 'title', 'updatedAt'] as const
   $columns = LessonHeaderSchema.$columns
   @column()
   declare author: string
@@ -110,23 +63,6 @@ export class TagSchema extends BaseModel {
   declare id: number
   @column()
   declare name: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
-  $columns = UserSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare email: string
-  @column()
-  declare fullName: string | null
-  @column({ isPrimary: true })
-  declare id: number
-  @column({ serializeAs: null })
-  declare password: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

@@ -28,11 +28,11 @@ The codebase is not yet production-ready from a completeness and reliability sta
 ### High priority
 
 - [x] Replace hardcoded author IDs with the authenticated user ID in the lesson and file workflows
-- [ ] Enforce real authorization for lesson ownership during create, update, delete, and file operations
-- [ ] Implement private lesson visibility rules so users can access their own private lessons while others only see public content
-- [ ] Complete the `update` action in `Lesson-service/app/controllers/files_controller.ts`
-- [ ] Integrate file handling with an external storage service instead of only persisting metadata
-- [ ] Fix the TypeScript issues currently reported by `npm run typecheck`
+- [x] Enforce real authorization for lesson ownership during create, update, delete, and file operations
+- [x] Implement private lesson visibility rules so users can access their own private lessons while others only see public content
+- [x] Complete the `update` action in `Lesson-service/app/controllers/files_controller.ts`
+- [x] Integrate file handling with an external storage service instead of only persisting metadata
+- [x] Fix the TypeScript issues currently reported by `npm run typecheck`
 - [ ] Add automated tests for authentication, lesson CRUD, search, and file operations
 
 ### Medium priority
