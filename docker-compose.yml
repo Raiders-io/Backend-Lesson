@@ -30,7 +30,6 @@ services:
       - api-network
       # - public-network
     volumes:
-      - ./Lesson-service:/app
       - /app/node_modules
 
   postgresql:

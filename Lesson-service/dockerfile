@@ -14,22 +14,22 @@ RUN npm ci
 FROM deps AS build
 WORKDIR /app
 COPY . .
+RUN node ace build
+
+# ----------------------------
+# Stage 3: Production runtime
+# ----------------------------
+FROM base AS production
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=build /app/build ./
+COPY setup.sh ./
 RUN chmod +x setup.sh
+
+RUN npm ci --omit=dev
+
 EXPOSE 3333
-# RUN apt-get update && apt-get install -y postgresql-client
-# RUN node ace build
+
 ENTRYPOINT ["sh" , "/app/setup.sh"]
-CMD ["npm", "run", "dev"]
-
-# # ----------------------------
-# # Stage 3: Production runtime
-# # ----------------------------
-# FROM base AS production
-# WORKDIR /app
-# ENV NODE_ENV=production
-
-# COPY --from=build /app/build ./
-# RUN npm ci --omit=dev
-
-# EXPOSE 3333
-# CMD ["node", "bin/server.js"]
+CMD ["node", "bin/server.js"]

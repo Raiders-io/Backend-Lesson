@@ -4,7 +4,7 @@ DIRPATH="./"
 TZ=UTC
 PORT=3333
 HOST=0.0.0.0
-NODE_ENV=development
+NODE_ENV=production
 
 # App
 LOG_LEVEL=info
