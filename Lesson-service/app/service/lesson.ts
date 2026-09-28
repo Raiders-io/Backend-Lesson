@@ -121,7 +121,7 @@ export class LessonOperations {
   }
 
   async getLessonsByIds(lessonIds: string[], userId?: string) {
-    return filterPrivate(await LessonHeader.query().where('lesson_id', lessonIds), userId)
+    return filterPrivate(await LessonHeader.query().whereIn('lesson_id', lessonIds), userId)
   }
 }
 

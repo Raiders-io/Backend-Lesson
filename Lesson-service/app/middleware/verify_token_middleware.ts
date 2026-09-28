@@ -19,14 +19,12 @@ async function verifyToken(token: string): Promise<string | null> {
 }
 
 export async function getUsername(token: string): Promise<UserInfo | null> {
-  console.log('Fetching username with token:', token)
   try {
     const res = await fetch(`${env.get('AUTH_SERVICE_URL')}/api/v1/account/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!res.ok) return null
     const body = (await res.json()) as { data: { id: string; fullName: string; email: string } }
-    console.log('Fetched user info:', body.data)
     body.data.fullName = body.data.fullName.replace(/\s+/g, '-') // Replace spaces with hyphens
     return new UserInfo({ id: body.data.id, username: body.data.fullName, email: body.data.email })
   } catch (error) {

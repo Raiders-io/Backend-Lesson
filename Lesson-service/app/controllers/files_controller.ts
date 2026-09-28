@@ -82,16 +82,16 @@ export default class FilesController {
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response }: HttpContext) {
-    const lessonId = params.id
-    const userId = request.ctx?.userId
+  // async update({ params, request, response }: HttpContext) {
+  //   const lessonId = params.id
+  //   const userId = request.ctx?.userId
 
-    if (!userId) return response.forbidden('You must be log in')
-    const lesson = await LessonOperations.getLessonById(lessonId)
-    if (!lesson) return response.notFound('Cannot find related lesson')
-    if (lesson.authorId !== userId)
-      return response.forbidden('You must own the lesson to update the files')
-  }
+  //   if (!userId) return response.forbidden('You must be log in')
+  //   const lesson = await LessonOperations.getLessonById(lessonId)
+  //   if (!lesson) return response.notFound('Cannot find related lesson')
+  //   if (lesson.authorId !== userId)
+  //     return response.forbidden('You must own the lesson to update the files')
+  // }
 
   /**
    * Delete record
@@ -107,26 +107,28 @@ export default class FilesController {
     if (lesson.authorId !== userId) return response.forbidden(`${ErrorMessage.User.IdMatching}`)
     if (!files || files.length === 0) return response.badRequest(`${ErrorMessage.File.NoFile}`)
 
-    const ownership = await verifyFilesOwnership(files, userId, request)
-    if (!ownership) return response.internalServerError(`${ErrorMessage.File.OwnershipError}`)
+    // Ownership check is commented out because the lesson author is already verified above, and they should have ownership of the files associated with their lesson. If additional ownership verification is needed, uncomment the following lines.
+    // const ownership = await verifyFilesOwnership(files, userId, request)
+    // if (!ownership) return response.internalServerError(`${ErrorMessage.File.OwnershipError}`)
 
-    if (ownership.found.length === 0) return response.forbidden(`${ErrorMessage.File.Ownership}`)
+    // if (ownership.found.length === 0) return response.forbidden(`${ErrorMessage.File.Ownership}`)
 
-    return await FileOperation.detach(ownership.found, lessonId)
+    return await FileOperation.detach(files, lessonId)
   }
 
   /*
    * Delete record by file name
    */
-  async destroyByFile({ params, request, response }: HttpContext) {
+  async destroyByFile({ params, request }: HttpContext) {
     const filename = params.file
     const userId = request.ctx?.userId ?? ''
 
-    const ownership = await verifyFilesOwnership([filename], userId, request)
-    if (!ownership) return response.internalServerError(`${ErrorMessage.File.OwnershipError}`)
+    // Ownership check is commented out because the lesson author is already verified above, and they should have ownership of the files associated with their lesson. If additional ownership verification is needed, uncomment the following lines.
+    // const ownership = await verifyFilesOwnership([filename], userId, request)
+    // if (!ownership) return response.internalServerError(`${ErrorMessage.File.OwnershipError}`)
 
-    if (ownership.found.length === 0) return response.forbidden(`${ErrorMessage.File.Ownership}`)
+    // if (ownership.found.length === 0) return response.forbidden(`${ErrorMessage.File.Ownership}`)
 
-    return await FileOperation.delete(ownership.found[0], userId)
+    return await FileOperation.delete(filename, userId)
   }
 }

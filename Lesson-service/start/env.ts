@@ -37,4 +37,6 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Auth Service
   AUTH_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
+  FILE_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
+  FILE_VERIFY_ROUTE_URL: Env.schema.string(),
 })
