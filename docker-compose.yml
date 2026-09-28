@@ -25,6 +25,8 @@ services:
       APP_URL: ${APP_URL}
       SESSION_DRIVER: ${SESSION_DRIVER}
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+      FILE_SERVICE_URL: ${FILE_SERVICE_URL}
+      FILE_VERIFY_ROUTE_URL: ${FILE_VERIFY_ROUTE_URL}
     networks:
       - default-network
       - api-network

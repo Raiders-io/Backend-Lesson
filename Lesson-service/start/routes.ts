@@ -42,7 +42,7 @@ router
               .group(() => {
                 router.get('/', [controllers.Files, 'index'])
                 router.post('/', [controllers.Files, 'store'])
-                router.put('/', [controllers.Files, 'update'])
+                // router.put('/', [controllers.Files, 'update']) // Update files is not revalent for now
                 router.delete('/', [controllers.Files, 'destroy'])
                 router.get('/:file', [controllers.Files, 'show'])
               })
@@ -54,7 +54,7 @@ router
             router.delete('/:file', [controllers.Files, 'destroyByFile'])
             router.get('/:file', [controllers.Files, 'showLessons'])
           })
-          .prefix('/file')
+          .prefix('/files')
       })
       .prefix('/lessons')
     router.get('/search', [controllers.Searches, 'index'])
