@@ -28,7 +28,7 @@ class EventGenerator {
         authorId: authorId,
         date: new Date(),
       },
-      type: `${service}.lesson.deleted`,
+      type: `${service}.lesson.created`,
     }
   }
 
