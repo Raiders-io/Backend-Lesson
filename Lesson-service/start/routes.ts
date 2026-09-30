@@ -18,8 +18,8 @@ router
         router.get('/tags', [controllers.Lessons, 'showTags'])
 
         router.group(() => {
-          router.get('/', [controllers.Lessons, 'index'])
-          router.post('/', [controllers.Lessons, 'store'])
+          router.get('/', [controllers.Lessons, 'index']) // Remove ?
+          router.post('/', [controllers.Lessons, 'store']) //Create new lesson
 
           router
             .group(() => {
@@ -40,10 +40,10 @@ router
 
             router
               .group(() => {
-                router.get('/', [controllers.Files, 'index'])
-                router.post('/', [controllers.Files, 'store'])
+                router.get('/', [controllers.Files, 'index']) //All file of a lesson
+                router.post('/', [controllers.Files, 'store']) //Upload new file to a lesson
                 // router.put('/', [controllers.Files, 'update']) // Update files is not revalent for now
-                router.delete('/', [controllers.Files, 'destroy'])
+                router.delete('/', [controllers.Files, 'destroy']) //Delete files from a lesson (In body)
                 router.get('/:file', [controllers.Files, 'show'])
               })
               .prefix('/:id/files')

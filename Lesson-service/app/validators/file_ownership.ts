@@ -8,3 +8,5 @@ export const fileOwnershipValidator = vine.create({
 export const fileDataValidator = vine.create({
   files: vine.array(vine.string()),
 })
+
+//Validate body of request
