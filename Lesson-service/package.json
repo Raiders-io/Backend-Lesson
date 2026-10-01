@@ -69,6 +69,7 @@
     "@adonisjs/session": "^8.1.0",
     "@adonisjs/shield": "^9.0.0",
     "@japa/api-client": "^3.2.1",
+    "@julr/adonisjs-prometheus": "^2.1.0",
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.3.1",
     "@yosone/broker": "^1.1.9",
@@ -85,5 +86,9 @@
       "./app/middleware/*.ts"
     ]
   },
-  "prettier": "@adonisjs/prettier-config"
+  "prettier": "@adonisjs/prettier-config",
+  "allowScripts": {
+    "@swc/core@1.15.47": true,
+    "better-sqlite3@12.11.1": true
+  }
 }
