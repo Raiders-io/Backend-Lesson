@@ -1,0 +1,20 @@
+meta {
+  name: GetById
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/lessons/byId/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: ab1078d2-f6df-4e1d-986b-2ec8e5ebc0f3
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

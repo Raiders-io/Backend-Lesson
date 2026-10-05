@@ -41,8 +41,12 @@ export class LessonOperations {
     const lesson = await LessonHeader.findBy('lesson_id', lessonId)
     if (!lesson) return
     await lesson.delete()
-    const event = EventGenerator.lessonDeleted(lessonId, lesson.authorId)
-    publish(STREAM_NAME, event, PublishOpt)
+    try {
+      const event = EventGenerator.lessonDeleted(lessonId, lesson.authorId)
+      publish(STREAM_NAME, event, PublishOpt)
+    } catch (error) {
+      console.error('Error occurred while publishing lesson deletion:', error)
+    }
   }
 
   async deleteLessonsByAuthor(authorId: string) {
@@ -51,10 +55,8 @@ export class LessonOperations {
       .delete()
       .returning('lesson_id')
     if (!lessons || lessons.length === 0) return
-    for (const lesson of lessons) {
-      const event = EventGenerator.lessonDeleted(lesson.lesson_id, authorId)
-      publish(STREAM_NAME, event, PublishOpt)
-    }
+    const event = EventGenerator.lessonDeleted(lessons, authorId)
+    publish(STREAM_NAME, event, PublishOpt)
   }
 
   async updateLesson(lesson: LessonHeader, lessonData: LessonDataInterface) {
@@ -67,7 +69,7 @@ export class LessonOperations {
     }
 
     const duplicate = await LessonHeader.query()
-      .where('author', lesson.author)
+      .where('author_id', lesson.authorId)
       .where('slug', lesson.slug)
       .whereNot('lessonId', lesson.lessonId)
       .first()
@@ -78,7 +80,6 @@ export class LessonOperations {
 
     lesson.isPrivate = lessonData.privacy ?? lesson.isPrivate
     lesson.description = lessonData.description ?? lesson.description
-    lesson.author = lessonData.username ?? lesson.author
     const currTags = lessonData.tags?.length
       ? lessonData.tags
       : Array.from(lesson.tags, (tag) => tag.id)
@@ -92,15 +93,15 @@ export class LessonOperations {
     publish(STREAM_NAME, event, PublishOpt)
   }
 
-  async getLessonByAuthor(author: string, userId?: string) {
-    const lessons = await LessonHeader.query().where('author', author).preload('tags')
+  async getLessonByAuthor(authorId: string, userId?: string) {
+    const lessons = await LessonHeader.query().where('author_id', authorId).preload('tags')
 
     return filterPrivate(lessons, userId)
   }
 
-  async getLessonByAuthorAndContent(author: string, content: string, userId?: string) {
+  async getLessonByAuthorAndContent(authorId: string, content: string, userId?: string) {
     const lesson = await LessonHeader.query()
-      .where('author', author)
+      .where('author_id', authorId)
       .where('slug', content)
       .preload('tags')
       .first()

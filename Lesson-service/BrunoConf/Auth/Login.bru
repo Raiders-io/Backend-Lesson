@@ -1,0 +1,26 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "fullName": "test",
+    "email": "test@test.test",
+    "password": "password",
+    "passwordConfirmation": "password"
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -10,7 +10,7 @@ import type {
 const service = 'lesson'
 
 class EventGenerator {
-  lessonDeleted(lessonId: string, authorId: string): LessonDeletedEvent {
+  lessonDeleted(lessonId: string | string[], authorId: string): LessonDeletedEvent {
     return {
       payload: {
         lessonId: lessonId,
