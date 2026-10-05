@@ -90,14 +90,14 @@ export default class LessonsController {
     const userId: string | undefined = request.ctx?.userId
     if (!userId) return response.unauthorized(ErrorMessage.User.Logout)
 
-    const user = await User.find(userId)
+    let user = await User.find(userId)
     if (!user) {
       //In this case i may want to store the lesson and post a msg so when the user-service is up again it can tell me the relation
       const userInfo: UserInfo | null = await getUsername(
         request.header('authorization')?.replace('Bearer ', '') ?? ''
       )
       if (!userInfo) return response.internalServerError(ErrorMessage.User.Fetch)
-      User.create({ id: userId, username: userInfo.username })
+      user = await User.create({ id: userId, username: userInfo.username })
     }
 
     if (!lessonDataInterface.title) {
