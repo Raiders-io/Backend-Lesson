@@ -46,7 +46,7 @@ export interface LessonCreatedEvent {
 
 export interface LessonDeletedEvent {
   payload: {
-    lessonId: string
+    lessonId: string | string[]
     authorId: string
     date: Date
   }

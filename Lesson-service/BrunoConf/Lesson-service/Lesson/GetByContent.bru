@@ -1,0 +1,21 @@
+meta {
+  name: GetByContent
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/lessons/cnt/:author/:content
+  body: none
+  auth: inherit
+}
+
+params:path {
+  author: Adam
+  content: based-world
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

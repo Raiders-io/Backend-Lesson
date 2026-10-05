@@ -841,3 +841,43 @@ export interface FileDeletedEvent {
 
 verif file:
 /api/v1/storage/users/:userid/objects/search
+
+
+```mermaid
+erDiagram
+    lesson_headers ||--o{ lesson_files : "contains"
+    lesson_headers ||--o{ lesson_tags : "has"
+    tags ||--o{ lesson_tags : "associated_with"
+
+    lesson_headers {
+        uuid lesson_id PK
+        string title
+        text description
+        string slug
+        string author
+        uuid author_id
+        boolean is_private
+        float pertinence
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    lesson_files {
+        string filename PK
+        uuid lesson_id PK, FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    tags {
+        increments id PK
+        string name UK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    lesson_tags {
+        uuid lesson_id PK, FK
+        integer tag_id PK, FK
+    }
+```

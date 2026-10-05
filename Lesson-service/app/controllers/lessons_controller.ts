@@ -5,6 +5,7 @@ import LessonOperations from '#service/lesson'
 import { getUsername } from '#middleware/verify_token_middleware'
 import type { UserInfo, LessonDataInterface } from '#utils/types'
 import { ErrorMessage } from '#utils/message'
+import User from '#models/user'
 
 export default class LessonsController {
   /**
@@ -19,8 +20,12 @@ export default class LessonsController {
    * Show individual record
    */
   async showByContent({ request, params, response }: HttpContext) {
+    const authorId = await User.query()
+      .where('username', params.author)
+      .firstOrFail()
+      .then((user) => user.id)
     const lesson = await LessonOperations.getLessonByAuthorAndContent(
-      params.author,
+      authorId,
       params.content,
       request.ctx?.userId
     )
@@ -36,7 +41,10 @@ export default class LessonsController {
    *
    */
   async showByAuthor({ request, params, response }: HttpContext) {
-    const authorId = params.author
+    const authorId = await User.query()
+      .where('username', params.author)
+      .firstOrFail()
+      .then((user) => user.id)
 
     const lessons = await LessonOperations.getLessonByAuthor(authorId, request.ctx?.userId)
 
@@ -79,14 +87,18 @@ export default class LessonsController {
       'privacy',
     ])
 
-    const userId: string = request.ctx?.userId ?? ''
-    const userInfo: UserInfo | null = await getUsername(
-      request.header('authorization')?.replace('Bearer ', '') ?? ''
-    )
-
+    const userId: string | undefined = request.ctx?.userId
     if (!userId) return response.unauthorized(ErrorMessage.User.Logout)
 
-    if (!userInfo) return response.internalServerError(ErrorMessage.User.Fetch)
+    const user = await User.find(userId)
+    if (!user) {
+      //In this case i may want to store the lesson and post a msg so when the user-service is up again it can tell me the relation
+      const userInfo: UserInfo | null = await getUsername(
+        request.header('authorization')?.replace('Bearer ', '') ?? ''
+      )
+      if (!userInfo) return response.internalServerError(ErrorMessage.User.Fetch)
+      User.create({ id: userId, username: userInfo.username })
+    }
 
     if (!lessonDataInterface.title) {
       return response.badRequest({ error: ErrorMessage.Lessons.NoTitle })
@@ -103,10 +115,7 @@ export default class LessonsController {
 
     const lessonModel = new LessonHeader()
 
-    const query = await LessonHeader.query()
-      .where('author', userInfo.username)
-      .where('slug', slug)
-      .first()
+    const query = await LessonHeader.query().where('authorId', userId).where('slug', slug).first()
     if (query) {
       return response.conflict(ErrorMessage.Lessons.Collision)
     }
@@ -114,8 +123,7 @@ export default class LessonsController {
     lessonModel.title = lessonDataInterface.title
     lessonModel.slug = slug
     lessonModel.isPrivate = lessonDataInterface.privacy ?? false
-    lessonModel.author = userInfo.username
-    lessonModel.authorId = userInfo.id
+    lessonModel.authorId = userId
     lessonModel.description = lessonDataInterface.description ?? ''
 
     let lessonId: string
@@ -128,17 +136,16 @@ export default class LessonsController {
    * Handle form submission for the edit action by author/content
    */
   async updateByContent({ params, request, response }: HttpContext) {
+    const authorId = request.ctx?.userId
+    if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
+
     const lesson = await LessonHeader.query()
-      .where('author', params.author)
+      .where('author_id', authorId)
       .where('slug', params.content)
       .first()
     if (!lesson) {
       return response.notFound(ErrorMessage.Lessons.NotFound)
     }
-
-    const authorId = request.ctx?.userId
-    if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
-    if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
     const lessonDataInterface = request.only(['title', 'tags', 'description', 'privacy'])
     try {
@@ -193,17 +200,16 @@ export default class LessonsController {
   }
 
   async destroyByContent({ request, params, response }: HttpContext) {
+    const authorId = request.ctx?.userId
+    if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
+
     const lesson = await LessonHeader.query()
-      .where('author', params.author)
+      .where('author_id', authorId)
       .where('content', params.content)
       .first()
     if (!lesson) {
       return response.notFound(ErrorMessage.Lessons.NotFound)
     }
-
-    const authorId = request.ctx?.userId
-    if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
-    if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
     await LessonOperations.deleteLessonById(lesson.lessonId)
     return response.ok(ErrorMessage.Lessons.Ok)

@@ -1,0 +1,25 @@
+meta {
+  name: createLesson
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/lessons
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "Based WWorld",
+    "tags": [
+      1
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

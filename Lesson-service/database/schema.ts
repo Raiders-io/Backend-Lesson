@@ -21,10 +21,18 @@ export class LessonFileSchema extends BaseModel {
 }
 
 export class LessonHeaderSchema extends BaseModel {
-  static $columns = ['author', 'authorId', 'createdAt', 'description', 'isPrivate', 'lessonId', 'pertinence', 'slug', 'title', 'updatedAt'] as const
+  static $columns = [
+    'authorId',
+    'createdAt',
+    'description',
+    'isPrivate',
+    'lessonId',
+    'pertinence',
+    'slug',
+    'title',
+    'updatedAt',
+  ] as const
   $columns = LessonHeaderSchema.$columns
-  @column()
-  declare author: string
   @column()
   declare authorId: string
   @column.dateTime({ autoCreate: true })
@@ -65,4 +73,17 @@ export class TagSchema extends BaseModel {
   declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class UserSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'updatedAt', 'username'] as const
+  $columns = UserSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare username: string
 }
