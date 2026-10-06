@@ -39,4 +39,10 @@ export default await Env.create(new URL('../', import.meta.url), {
   AUTH_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
   FILE_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
   FILE_VERIFY_ROUTE_URL: Env.schema.string(),
+
+  REDIS_HOST: Env.schema.string({ format: 'url' }),
+  REDIS_PORT: Env.schema.number(),
+  CONSUMER_NAME: Env.schema.string(),
+  CONSUMER_GROUP: Env.schema.string(),
+  LOGLEVEL: Env.schema.enum(['DEBUG', 'INFO', 'WARN', 'ERROR'] as const),
 })

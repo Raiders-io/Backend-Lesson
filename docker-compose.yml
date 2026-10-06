@@ -27,6 +27,11 @@ services:
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
       FILE_SERVICE_URL: ${FILE_SERVICE_URL}
       FILE_VERIFY_ROUTE_URL: ${FILE_VERIFY_ROUTE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      CONSUMER_NAME: ${CONSUMER_NAME}
+      CONSUMER_GROUP: ${CONSUMER_GROUP}
+      LOGLEVEL: ${LOGLEVEL}
     networks:
       - default-network
       - api-network
