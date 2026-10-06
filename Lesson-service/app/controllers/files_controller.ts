@@ -29,9 +29,10 @@ async function verifyFilesOwnership(files: string[], userId: string, request: Ht
 }
 
 export default class FilesController {
-  async index({ params, response }: HttpContext) {
+  async index({ params, request, response }: HttpContext) {
     const lessonId = params.id
-
+    const lesson = await LessonOperations.getLessonById(lessonId, request.ctx?.userId)
+    if (!lesson) return response.notFound(`${ErrorMessage.File.RelatedLesson}`)
     const files = await FileOperation.getByLessonId(lessonId)
     if (!files || files.length === 0) return response.notFound(`${ErrorMessage.File.NotFound}`)
 
