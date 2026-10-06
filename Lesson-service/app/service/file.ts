@@ -66,10 +66,10 @@ class FileOperation {
       .first()
   }
 
-  async getRelatedLesson(filename: string) {
+  async getRelatedLesson(filename: string, userId?: string) {
     const files = await LessonFile.query().where('filename', filename)
     const ids = Array.from(files, (file) => file.lessonId)
-    return await LessonOperations.getLessonsByIds(ids)
+    return await LessonOperations.getLessonsByIds(ids, userId)
   }
 }
 

@@ -74,27 +74,14 @@ export default class FilesController {
     return file
   }
 
-  async showLessons({ params, response }: HttpContext) {
+  async showLessons({ params, request, response }: HttpContext) {
     const filename = params.file
 
-    const lessons = await FileOperation.getRelatedLesson(filename)
+    const lessons = await FileOperation.getRelatedLesson(filename, request.ctx?.userId)
     if (!lessons || lessons.length === 0)
       return response.notFound(`${ErrorMessage.File.RelatedLesson}`)
     return lessons
   }
-  /**
-   * Handle form submission for the edit action
-   */
-  // async update({ params, request, response }: HttpContext) {
-  //   const lessonId = params.id
-  //   const userId = request.ctx?.userId
-
-  //   if (!userId) return response.forbidden('You must be log in')
-  //   const lesson = await LessonOperations.getLessonById(lessonId)
-  //   if (!lesson) return response.notFound('Cannot find related lesson')
-  //   if (lesson.authorId !== userId)
-  //     return response.forbidden('You must own the lesson to update the files')
-  // }
 
   /**
    * Delete record
