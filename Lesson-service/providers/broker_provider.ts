@@ -1,7 +1,6 @@
 import type { ApplicationService } from '@adonisjs/core/types'
 import { Broker, consume } from '@yosone/broker'
 import LessonOperations from '#service/lesson'
-import { LOGLEVEL } from '@yosone/broker'
 import env from '#start/env'
 
 export default class BrokerProvider {
