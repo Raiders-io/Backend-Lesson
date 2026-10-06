@@ -10,28 +10,30 @@ services:
       postgresql:
         condition: service_healthy
     environment:
-      DB_CONNECTION: ${DB_CONNECTION}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_DATABASE: ${DB_DATABASE}
-      TZ: ${TZ}
+      DB_CONNECTION: ${DB_CONNECTION:?}
+      DB_HOST: ${DB_HOST:?}
+      DB_PORT: ${DB_PORT:?}
+      DB_USER: ${DB_USER:?}
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      DB_DATABASE: ${DB_DATABASE:?}
+      TZ: ${TZ:?}
       PORT: 3333
-      HOST: ${HOST}
-      NODE_ENV: ${NODE_ENV}
-      LOG_LEVEL: ${LOG_LEVEL}
-      APP_KEY: ${APP_KEY}
-      APP_URL: ${APP_URL}
-      SESSION_DRIVER: ${SESSION_DRIVER}
-      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
-      FILE_SERVICE_URL: ${FILE_SERVICE_URL}
-      FILE_VERIFY_ROUTE_URL: ${FILE_VERIFY_ROUTE_URL}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      CONSUMER_NAME: ${CONSUMER_NAME}
-      CONSUMER_GROUP: ${CONSUMER_GROUP}
-      LOGLEVEL: ${LOGLEVEL}
+      HOST: ${HOST:?}
+      NODE_ENV: ${NODE_ENV:?}
+      LOG_LEVEL: ${LOG_LEVEL:?}
+      APP_KEY: ${APP_KEY:?}
+      APP_URL: ${APP_URL:?}
+      SESSION_DRIVER: ${SESSION_DRIVER:?}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:?}
+      FILE_SERVICE_URL: ${FILE_SERVICE_URL:?}
+      FILE_VERIFY_ROUTE_URL: ${FILE_VERIFY_ROUTE_URL:?}
+      REDIS_HOST: ${REDIS_HOST:?}
+      REDIS_PORT: ${REDIS_PORT:?}
+      CONSUMER_NAME: ${CONSUMER_NAME:?}
+      CONSUMER_GROUP: ${CONSUMER_GROUP:?}
+      REDIS_LOGLEVEL: ${REDIS_LOGLEVEL}
+      TAG_FILE: ${TAG_FILE}
+
     networks:
       - default-network
       - api-network
@@ -43,10 +45,10 @@ services:
     image: postgres:18.4-alpine3.23
 
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_PORT: ${DB_PORT}
+      POSTGRES_USER: ${DB_USER:?}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?}
+      POSTGRES_DB: ${DB_DATABASE:?}
+      POSTGRES_PORT: ${DB_PORT:?}
     volumes:
       - pg-data:/var/lib/postgresql
     networks:
