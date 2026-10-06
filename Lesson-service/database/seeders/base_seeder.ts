@@ -1,19 +1,24 @@
-import { LessonHeaderFactory } from '#database/factories/lesson_header_factory'
-import { TagFactory } from '#database/factories/tag_factory'
+import { readFile } from 'node:fs/promises'
+import Tag from '#models/tag'
+import env from '#start/env'
+import app from '@adonisjs/core/services/app'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class extends BaseSeeder {
   async run() {
-    const targetPool = await TagFactory.createMany(10)
-    const lessonHeaders = await LessonHeaderFactory.createMany(20)
+    const filePath = app.makePath(env.get('TAG_FILE'))
+    const content = await readFile(filePath, 'utf8')
 
-    for (const lesson of lessonHeaders) {
-      const randomTags = targetPool
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3)
-        .map((tag) => tag.id)
+    const uniqueNames = Array.from(
+      new Set(
+        content
+          .split(/\r?\n/)
+          .map((name) => name.trim())
+          .filter(Boolean)
+      )
+    )
 
-      await lesson.related('tags').attach(randomTags)
-    }
+    const payload = uniqueNames.map((name) => ({ name }))
+    await Tag.fetchOrCreateMany('name', payload)
   }
 }

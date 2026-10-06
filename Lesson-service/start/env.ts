@@ -44,5 +44,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   REDIS_PORT: Env.schema.number(),
   CONSUMER_NAME: Env.schema.string(),
   CONSUMER_GROUP: Env.schema.string(),
-  LOGLEVEL: Env.schema.enum(['DEBUG', 'INFO', 'WARN', 'ERROR'] as const),
+  REDIS_LOGLEVEL: Env.schema.enum(['DEBUG', 'INFO', 'WARN', 'ERROR'] as const),
+  TAG_FILE: Env.schema.string(),
 })
