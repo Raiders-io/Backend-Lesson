@@ -1,5 +1,5 @@
 import type { ApplicationService } from '@adonisjs/core/types'
-import { Broker, consume } from '@yosone/broker'
+import { Broker, consume, LOGLEVEL } from '@yosone/broker'
 import LessonOperations from '#service/lesson'
 import env from '#start/env'
 
@@ -25,11 +25,14 @@ export default class BrokerProvider {
    * The process has been started
    */
   async ready() {
+    const logLevel = env.get('REDIS_LOGLEVEL')
+      ? Number.parseInt(env.get('REDIS_LOGLEVEL'))
+      : LOGLEVEL.ERROR
     Broker.init({
       group: env.get('CONSUMER_GROUP'),
       consumer: env.get('CONSUMER_NAME'),
       redisUrl: env.get('REDIS_HOST') + ':' + env.get('REDIS_PORT'),
-      logLevel: Number.parseInt(env.get('LOGLEVEL')),
+      logLevel: logLevel,
     })
 
     const authConsumer = consume('auth.events')
