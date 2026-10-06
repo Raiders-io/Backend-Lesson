@@ -24,4 +24,26 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
+
+  // Database
+  DB_CONNECTION: Env.schema.enum(['pg'] as const),
+  DB_HOST: Env.schema.string({ format: 'host' }),
+  DB_PORT: Env.schema.number(),
+  DB_USER: Env.schema.string(),
+  DB_PASSWORD: Env.schema.string(),
+  DB_DATABASE: Env.schema.string(),
+
+  // Message broker (Redis)
+
+  // Auth Service
+  AUTH_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
+  FILE_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
+  FILE_VERIFY_ROUTE_URL: Env.schema.string(),
+
+  REDIS_HOST: Env.schema.string({ format: 'url' }),
+  REDIS_PORT: Env.schema.number(),
+  CONSUMER_NAME: Env.schema.string(),
+  CONSUMER_GROUP: Env.schema.string(),
+  REDIS_LOGLEVEL: Env.schema.enum(['DEBUG', 'INFO', 'WARN', 'ERROR'] as const),
+  TAG_FILE: Env.schema.string(),
 })

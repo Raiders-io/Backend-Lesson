@@ -7,44 +7,83 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
-export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
-  $columns = AuthAccessTokenSchema.$columns
-  @column()
-  declare abilities: string
+export class LessonFileSchema extends BaseModel {
+  static $columns = ['createdAt', 'filename', 'lessonId', 'updatedAt'] as const
+  $columns = LessonFileSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
-  @column.dateTime()
-  declare expiresAt: DateTime | null
+  @column({ isPrimary: true })
+  declare filename: string
   @column()
-  declare hash: string
+  declare lessonId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class LessonHeaderSchema extends BaseModel {
+  static $columns = [
+    'authorId',
+    'createdAt',
+    'description',
+    'isPrivate',
+    'lessonId',
+    'pertinence',
+    'slug',
+    'title',
+    'updatedAt',
+  ] as const
+  $columns = LessonHeaderSchema.$columns
+  @column()
+  declare authorId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column()
+  declare description: string | null
+  @column()
+  declare isPrivate: boolean
+  @column({ isPrimary: true })
+  declare lessonId: string
+  @column()
+  declare pertinence: number
+  @column()
+  declare slug: string
+  @column()
+  declare title: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class LessonTagSchema extends BaseModel {
+  static $columns = ['lessonId', 'tagId'] as const
+  $columns = LessonTagSchema.$columns
+  @column({ isPrimary: true })
+  declare lessonId: string
+  @column()
+  declare tagId: number
+}
+
+export class TagSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'name', 'updatedAt'] as const
+  $columns = TagSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
-  @column.dateTime()
-  declare lastUsedAt: DateTime | null
   @column()
-  declare name: string | null
-  @column()
-  declare tokenableId: number
-  @column()
-  declare type: string
+  declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
+  static $columns = ['createdAt', 'id', 'updatedAt', 'username'] as const
   $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare email: string
-  @column()
-  declare fullName: string | null
+  declare createdAt: DateTime | null
   @column({ isPrimary: true })
-  declare id: number
-  @column({ serializeAs: null })
-  declare password: string
+  declare id: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare username: string
 }

@@ -1,0 +1,20 @@
+meta {
+  name: deleteLessonById
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/lessons/byId/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: a045d017-41ad-4917-aafd-0a1d8729624e
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
