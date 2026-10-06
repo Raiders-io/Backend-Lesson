@@ -63,8 +63,10 @@ export default class FilesController {
   /**
    * Show individual record
    */
-  async show({ params, response }: HttpContext) {
+  async show({ params, request, response }: HttpContext) {
     const [lessonId, filename] = [params.id, params.file]
+    const lesson = await LessonOperations.getLessonById(lessonId, request.ctx?.userId)
+    if (!lesson) return response.notFound(`${ErrorMessage.File.RelatedLesson}`)
 
     const file = await FileOperation.getByLessonIdAndFile(filename, lessonId)
     if (!file) return response.notFound(`${ErrorMessage.File.NotFound}`)
