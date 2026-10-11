@@ -25,6 +25,7 @@ ENV NODE_ENV=production
 
 COPY --from=build /app/build ./
 COPY setup.sh ./
+COPY lesson_tags.csv ./
 RUN chmod +x setup.sh
 
 RUN npm ci --omit=dev

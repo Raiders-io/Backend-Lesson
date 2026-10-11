@@ -25,14 +25,14 @@ export default class BrokerProvider {
    * The process has been started
    */
   async ready() {
-    const logLevel = env.get('REDIS_LOGLEVEL')
-      ? Number.parseInt(env.get('REDIS_LOGLEVEL'))
-      : LOGLEVEL.ERROR
+    // const logLevel = env.get('REDIS_LOGLEVEL')
+    //   ? Number.parseInt(env.get('REDIS_LOGLEVEL'))
+    //   : LOGLEVEL.ERROR
     Broker.init({
       group: env.get('CONSUMER_GROUP'),
       consumer: env.get('CONSUMER_NAME'),
       redisUrl: env.get('REDIS_HOST') + ':' + env.get('REDIS_PORT'),
-      logLevel: logLevel,
+      logLevel: LOGLEVEL.ERROR,
     })
 
     const authConsumer = consume('auth.events')

@@ -36,11 +36,11 @@ NON_INTERACTIVE=false
 FORCE_REGENERATE=false
 HELP=false
 
-REDIS_HOST= http://redis
+REDIS_HOST=http://redis
 REDIS_PORT=6380
 CONSUMER_NAME=lesson-service-consumer
 CONSUMER_GROUP=lesson-service
-LOGLEVEL=ERROR
+TAG_FILE="./lesson_tags.csv"
 
 create_env(){
     cat << eof > $DIRPATH/.env
@@ -65,7 +65,6 @@ REDIS_HOST: ${REDIS_HOST}
 REDIS_PORT: ${REDIS_PORT}
 CONSUMER_NAME: ${CONSUMER_NAME}
 CONSUMER_GROUP: ${CONSUMER_GROUP}
-LOGLEVEL: ${LOGLEVEL}
 TAG_FILE: ${TAG_FILE}
 eof
 }
