@@ -36,7 +36,7 @@ NON_INTERACTIVE=false
 FORCE_REGENERATE=false
 HELP=false
 
-REDIS_HOST=http://redis
+REDIS_HOST=redis://redis
 REDIS_PORT=6380
 CONSUMER_NAME=lesson-service-consumer
 CONSUMER_GROUP=lesson-service
