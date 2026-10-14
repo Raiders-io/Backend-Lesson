@@ -114,13 +114,17 @@ export default class LessonsController {
     lessonModel.authorId = userId
     lessonModel.description = lessonData.description ?? ''
 
-    let lessonId: string
-    lessonId = await LessonOperations.storeLesson(
-      lessonModel,
-      lessonData.tags.map((tag) => tag.id)
-    )
+    try {
+      let lessonId: string
+      lessonId = await LessonOperations.storeLesson(
+        lessonModel,
+        lessonData.tags.map((tag) => tag.id)
+      )
 
-    return response.created({ lessonId })
+      return response.created({ lessonId })
+    } catch (error) {
+      return response.badRequest(ErrorMessage.Lessons.BadRequest)
+    }
   }
 
   /**
