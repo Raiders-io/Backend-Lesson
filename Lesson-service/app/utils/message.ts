@@ -21,5 +21,6 @@ export const ErrorMessage = {
     Collision: 'A lesson with the same title already exists for this author',
     Ok: 'Operation successful',
     Private: 'This lesson is private and you do not have access',
+    BadRequest: 'Invalid request data',
   },
 } as const

@@ -104,6 +104,7 @@ export class LessonOperations {
       .where('author_id', authorId)
       .where('slug', content)
       .preload('tags')
+      .preload('author')
       .first()
 
     return isAccessble(lesson, userId) ? lesson : null

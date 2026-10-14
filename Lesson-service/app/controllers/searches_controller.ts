@@ -9,7 +9,7 @@ export default class SearchesController {
     const page = request.input('page', 1)
     const limit = request.input('limit', 10)
 
-    const query = LessonHeader.query().preload('tags')
+    const query = LessonHeader.query().preload('tags').preload('author')
 
     query.where('is_private', false) // Only search public lessons
 
