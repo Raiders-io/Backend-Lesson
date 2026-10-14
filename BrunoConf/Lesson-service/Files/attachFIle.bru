@@ -1,0 +1,29 @@
+meta {
+  name: attachFIle
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/lessons/byId/:id/files
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 28dfbccb-5837-463c-bc55-7e0f7d75887b
+}
+
+body:json {
+  {
+    "files": [
+  //     "CV-2026-FR.pdf",
+      "CV.pdf"
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

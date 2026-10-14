@@ -1,0 +1,20 @@
+meta {
+  name: delete
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/lessons/files/:file
+  body: none
+  auth: inherit
+}
+
+params:path {
+  file: CV-2026-FR.pdf
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

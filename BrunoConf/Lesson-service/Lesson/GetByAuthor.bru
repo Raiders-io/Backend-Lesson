@@ -1,0 +1,20 @@
+meta {
+  name: GetByAuthor
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/lessons/cnt/:author
+  body: none
+  auth: inherit
+}
+
+params:path {
+  author: adam
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
