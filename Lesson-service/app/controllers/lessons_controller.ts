@@ -6,6 +6,7 @@ import { getUsername } from '#middleware/verify_token_middleware'
 import type { UserInfo, LessonDataInterface } from '#utils/types'
 import { ErrorMessage } from '#utils/message'
 import User from '#models/user'
+import { lessonCreationValidator } from '#validators/lesson'
 
 export default class LessonsController {
   /**
@@ -80,12 +81,7 @@ export default class LessonsController {
    * Handle form submission for the create action
    */
   async store({ request, response }: HttpContext) {
-    const lessonDataInterface: LessonDataInterface = request.only([
-      'title',
-      'description',
-      'tags',
-      'privacy',
-    ])
+    const lessonData = await request.validateUsing(lessonCreationValidator)
 
     const userId: string | undefined = request.ctx?.userId
     if (!userId) return response.unauthorized(ErrorMessage.User.Logout)
@@ -100,15 +96,7 @@ export default class LessonsController {
       user = await User.create({ id: userId, username: userInfo.username })
     }
 
-    if (!lessonDataInterface.title) {
-      return response.badRequest({ error: ErrorMessage.Lessons.NoTitle })
-    }
-
-    if (!Array.isArray(lessonDataInterface.tags) || lessonDataInterface.tags.length === 0) {
-      return response.badRequest(ErrorMessage.Lessons.NoTags)
-    }
-
-    const slug = lessonDataInterface.title
+    const slug = lessonData.title
       .toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-]/g, '')
@@ -120,14 +108,17 @@ export default class LessonsController {
       return response.conflict(ErrorMessage.Lessons.Collision)
     }
 
-    lessonModel.title = lessonDataInterface.title
+    lessonModel.title = lessonData.title
     lessonModel.slug = slug
-    lessonModel.isPrivate = lessonDataInterface.privacy ?? false
+    lessonModel.isPrivate = lessonData.privacy ?? false
     lessonModel.authorId = userId
-    lessonModel.description = lessonDataInterface.description ?? ''
+    lessonModel.description = lessonData.description ?? ''
 
     let lessonId: string
-    lessonId = await LessonOperations.storeLesson(lessonModel, lessonDataInterface.tags)
+    lessonId = await LessonOperations.storeLesson(
+      lessonModel,
+      lessonData.tags.map((tag) => tag.id)
+    )
 
     return response.created({ lessonId })
   }

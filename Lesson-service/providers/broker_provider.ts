@@ -1,7 +1,8 @@
 import type { ApplicationService } from '@adonisjs/core/types'
-import { Broker, consume, LOGLEVEL } from '@yosone/broker'
+import { Broker, consume, LOGLEVEL, publish } from '@yosone/broker'
 import LessonOperations from '#service/lesson'
 import env from '#start/env'
+import { STREAM_NAME } from '#utils/types'
 
 export default class BrokerProvider {
   constructor(protected app: ApplicationService) {}
@@ -25,9 +26,6 @@ export default class BrokerProvider {
    * The process has been started
    */
   async ready() {
-    // const logLevel = env.get('REDIS_LOGLEVEL')
-    //   ? Number.parseInt(env.get('REDIS_LOGLEVEL'))
-    //   : LOGLEVEL.ERROR
     Broker.init({
       group: env.get('CONSUMER_GROUP'),
       consumer: env.get('CONSUMER_NAME'),
@@ -35,14 +33,21 @@ export default class BrokerProvider {
       logLevel: LOGLEVEL.ERROR,
     })
 
+    publish(STREAM_NAME, {
+      type: 'lesson.started',
+      payload: {
+        status: 'Ok',
+      },
+    })
+
     const authConsumer = consume('auth.events')
 
-    authConsumer.on('auth.user.deleted', async (event) => {
+    authConsumer.on('auth.user.deleted', async (event: any) => {
       const authorId: string = event.payload.userId
       if (authorId) await LessonOperations.deleteLessonsByAuthor(authorId)
     })
 
-    authConsumer.on('auth.user.updated', async (event) => {
+    authConsumer.on('auth.user.updated', async (event: any) => {
       console.log('auth.user.updated event received', event)
     })
 
@@ -53,6 +58,6 @@ export default class BrokerProvider {
    * Preparing to shutdown the app
    */
   async shutdown() {
-    await Broker.disconnect()
+    await Broker.shutdown()
   }
 }
