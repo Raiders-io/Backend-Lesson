@@ -8,11 +8,24 @@ import { ErrorMessage } from '#utils/message'
 import User from '#models/user'
 import { lessonCreationValidator } from '#validators/lesson'
 
+
+//TODO maybe do a function for the try catch msg
 export default class LessonsController {
   /**
    * Display a list of resource
    */
-  async index({ response }: HttpContext) {
+  async index({ request, response }: HttpContext) {
+    const authorId = request.ctx?.userId
+
+    if (authorId) {
+      try {
+        const lesson = await LessonOperations.getLessonByAuthor(authorId, authorId)
+        return lesson
+
+      } catch (err) {
+        return err instanceof Error
+      }
+    }
     const lessons = await LessonHeader.query().preload('tags').where('isPrivate', false)
     return response.ok(lessons)
   }

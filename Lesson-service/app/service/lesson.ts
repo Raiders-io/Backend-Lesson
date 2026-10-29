@@ -81,7 +81,7 @@ export class LessonOperations {
     lesson.isPrivate = lessonData.privacy ?? lesson.isPrivate
     lesson.description = lessonData.description ?? lesson.description
     const currTags = lessonData.tags?.length
-      ? lessonData.tags
+      ? (lessonData.tags.map((t) => t.id))
       : Array.from(lesson.tags, (tag) => tag.id)
 
     await db.transaction(async (trx) => {
@@ -94,7 +94,7 @@ export class LessonOperations {
   }
 
   async getLessonByAuthor(authorId: string, userId?: string) {
-    const lessons = await LessonHeader.query().where('author_id', authorId).preload('tags')
+    const lessons = await LessonHeader.query().where('author_id', authorId).preload('tags').preload('author')
 
     return filterPrivate(lessons, userId)
   }
