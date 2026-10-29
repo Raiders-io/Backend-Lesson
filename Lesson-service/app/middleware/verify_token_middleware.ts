@@ -4,7 +4,6 @@ import env from '#start/env'
 import { UserInfo } from '#utils/types'
 
 async function verifyToken(token: string): Promise<string | null> {
-  console.log('Fetching user for token')
   try {
     const res = await fetch(`${env.get('AUTH_SERVICE_URL')}/api/v1/auth/verify`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -13,7 +12,7 @@ async function verifyToken(token: string): Promise<string | null> {
     const body = (await res.json()) as { data: { userId: string } }
     return body.data.userId
   } catch (error) {
-    console.log(`Error verifying token ${token}:`, error)
+    console.log(`Error verifying token`, error)
     return null
   }
 }

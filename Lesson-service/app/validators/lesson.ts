@@ -17,11 +17,6 @@ export const lessonCreationValidator = vine.create({
     .maxLength(100),
   description: vine
     .string()
-    .alphaNumeric({
-      allowDashes: true,
-      allowSpaces: true,
-      allowUnderscores: true,
-    })
     .maxLength(500)
     .optional(),
   privacy: vine.boolean(),
