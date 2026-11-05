@@ -80,17 +80,20 @@ export class LessonOperations {
 
     lesson.isPrivate = lessonData.privacy ?? lesson.isPrivate
     lesson.description = lessonData.description ?? lesson.description
-    const currTags = lessonData.tags?.length
-      ? (lessonData.tags.map((t) => t.id))
-      : Array.from(lesson.tags, (tag) => tag.id)
+
+    const newTagIds = lessonData.tags?.length ? lessonData.tags.map((t) => t.id) : null
 
     await db.transaction(async (trx) => {
       lesson.useTransaction(trx)
       await lesson.save()
-      await lesson.related('tags').sync(currTags)
+      if (newTagIds) await lesson.related('tags').sync(newTagIds)
     })
-    const event = EventGenerator.lessonUpdated(lesson.lessonId, lesson.authorId)
-    publish(STREAM_NAME, event, PublishOpt)
+    try {
+      const event = EventGenerator.lessonUpdated(lesson.lessonId, lesson.authorId)
+      publish(STREAM_NAME, event, PublishOpt)
+    } catch (error) {
+      console.error('Error occurred while publishing lesson update:', error)
+    }
   }
 
   async getLessonByAuthor(authorId: string, userId?: string) {

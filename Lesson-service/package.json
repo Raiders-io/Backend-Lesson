@@ -71,7 +71,7 @@
     "@japa/api-client": "^3.2.1",
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.3.1",
-    "@yosone/broker": "^1.1.7",
+    "@yosone/broker": "^1.1.9",
     "better-sqlite3": "^12.9.0",
     "dotenv": "^17.4.2",
     "luxon": "^3.7.2",

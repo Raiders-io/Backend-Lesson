@@ -150,6 +150,7 @@ export default class LessonsController {
     const lesson = await LessonHeader.query()
       .where('author_id', authorId)
       .where('slug', params.content)
+      .preload('tags')
       .first()
     if (!lesson) {
       return response.notFound(ErrorMessage.Lessons.NotFound)
@@ -182,7 +183,7 @@ export default class LessonsController {
       'description',
     ])
 
-    lesson.load('tags')
+    await lesson.load('tags')
     try {
       await LessonOperations.updateLesson(lesson, lessonUpdateData)
     } catch (error) {
