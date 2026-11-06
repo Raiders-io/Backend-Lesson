@@ -2,20 +2,28 @@
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
-  auth: {
-    newAccount: {
-      store: typeof routes['auth.new_account.store']
-    }
-    accessTokens: {
-      store: typeof routes['auth.access_tokens.store']
-    }
+  lessons: {
+    showTags: (typeof routes)['lessons.show_tags']
+    index: (typeof routes)['lessons.index']
+    store: (typeof routes)['lessons.store']
+    showByAuthor: (typeof routes)['lessons.show_by_author']
+    showByContent: (typeof routes)['lessons.show_by_content']
+    updateByContent: (typeof routes)['lessons.update_by_content']
+    destroyByContent: (typeof routes)['lessons.destroy_by_content']
+    showById: (typeof routes)['lessons.show_by_id']
+    updateById: (typeof routes)['lessons.update_by_id']
+    destroyById: (typeof routes)['lessons.destroy_by_id']
   }
-  profile: {
-    profile: {
-      show: typeof routes['profile.profile.show']
-    }
-    accessTokens: {
-      destroy: typeof routes['profile.access_tokens.destroy']
-    }
+  files: {
+    index: (typeof routes)['files.index']
+    store: (typeof routes)['files.store']
+    update: (typeof routes)['files.update']
+    destroy: (typeof routes)['files.destroy']
+    show: (typeof routes)['files.show']
+    destroyByFile: (typeof routes)['files.destroy_by_file']
+    showLessons: (typeof routes)['files.show_lessons']
+  }
+  searches: {
+    index: (typeof routes)['searches.index']
   }
 }

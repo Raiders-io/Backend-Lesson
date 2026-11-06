@@ -1,0 +1,36 @@
+meta {
+  name: updateByContent
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{PROTOCOL}}://{{HOST}}:{{PORT}}/api/v1/lessons/cnt/:author/:content
+  body: json
+  auth: inherit
+}
+
+params:path {
+  content: based-world-2
+  author: Adam
+}
+
+body:json {
+  {
+    "title": "To a better world",
+    "tags": [
+      1
+    ],
+    "description": "A new introduction to the world"
+  }
+}
+
+body:multipart-form {
+  file: [file_name]
+  ~files[]: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
