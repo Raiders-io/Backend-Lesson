@@ -39,6 +39,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   AUTH_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
   FILE_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
   FILE_VERIFY_ROUTE_URL: Env.schema.string(),
+  USER_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
 
   REDIS_HOST: Env.schema.string(),
   REDIS_PORT: Env.schema.number(),

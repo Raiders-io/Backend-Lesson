@@ -27,6 +27,7 @@ services:
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:?}
       FILE_SERVICE_URL: ${FILE_SERVICE_URL:?}
       FILE_VERIFY_ROUTE_URL: ${FILE_VERIFY_ROUTE_URL:?}
+      USER_SERVICE_URL: ${USER_SERVICE_URL:?}
       REDIS_HOST: ${REDIS_HOST:?}
       REDIS_PORT: ${REDIS_PORT:?}
       CONSUMER_NAME: ${CONSUMER_NAME:?}
@@ -68,4 +69,3 @@ networks:
     internal: true
   api-network:
     external: true
-
