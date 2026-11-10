@@ -30,6 +30,7 @@ REDIS_URL=redis://redis:6380
 FILE_SERVICE_URL=http://file-service:3333
 FILE_VERIFY_ROUTE_URL=/api/v1/storage/objects/search
 AUTH_SERVICE_URL=http://auth-service:3333
+USER_SERVICE_URL=http://user-service:3333
 
 #Flag
 NON_INTERACTIVE=false
@@ -42,8 +43,8 @@ CONSUMER_NAME=lesson-service-consumer
 CONSUMER_GROUP=lesson-service
 TAG_FILE="./lesson_tags.csv"
 
-create_env(){
-    cat << eof > $DIRPATH/.env
+create_env() {
+  cat <<eof >$DIRPATH/.env
 TZ=${TZ}
 PORT=${PORT}
 HOST=${HOST}
@@ -72,82 +73,88 @@ eof
 # Generate .env file with default values or prompt for custom values
 # Uncomment the following lines to enable custom database configuration
 generate_env() {
-    echo "Generating .env file..."
-    if [ "$NON_INTERACTIVE" = true ]; then
-        echo "Non-interactive mode: using default values."
-        create_env
-        return
-    fi
-    echo "Choose setup option:"
-    read -p "1. Quick setup (default values) 2. Custom setup: " choice
-    if [ "$choice" == "1" ]; then
-        create_env
-    elif [ "$choice" == "2" ]; then
-        read -p "Enter PORT (default: 3333): " PORT
-        PORT=${PORT:-3333}
-        read -p "Enter DB_USER (default: postgres): " DB_USER
-        DB_USER=${DB_USER:-postgres}
-        read -p "Enter DB_PASSWORD (default: postgres): " DB_PASSWORD
-        DB_PASSWORD=${DB_PASSWORD:-postgres}
-    fi
+  echo "Generating .env file..."
+  if [ "$NON_INTERACTIVE" = true ]; then
+    echo "Non-interactive mode: using default values."
     create_env
-    echo ".env file generated."
+    return
+  fi
+  echo "Choose setup option:"
+  read -p "1. Quick setup (default values) 2. Custom setup: " choice
+  if [ "$choice" == "1" ]; then
+    create_env
+  elif [ "$choice" == "2" ]; then
+    read -p "Enter PORT (default: 3333): " PORT
+    PORT=${PORT:-3333}
+    read -p "Enter DB_USER (default: postgres): " DB_USER
+    DB_USER=${DB_USER:-postgres}
+    read -p "Enter DB_PASSWORD (default: postgres): " DB_PASSWORD
+    DB_PASSWORD=${DB_PASSWORD:-postgres}
+  fi
+  create_env
+  echo ".env file generated."
 }
 
 check_env() {
-    if [ "$FORCE_REGENERATE" = true ]; then
-        echo "Force regenerating .env file..."
-        generate_env
-    elif [ ! -f .env ]; then
-        echo ".env file not found!"
-        generate_env
-    else
-        echo ".env file found."
-        if [ "$NON_INTERACTIVE" = true ]; then
-            echo "Non-interactive mode: skipping .env regeneration."
-            return
-        fi
-        read -p "Do you want to regenerate the .env file? (y/n): " regenerate
-        if [ "$regenerate" == "y" ]; then
-            generate_env
-        fi
+  if [ "$FORCE_REGENERATE" = true ]; then
+    echo "Force regenerating .env file..."
+    generate_env
+  elif [ ! -f .env ]; then
+    echo ".env file not found!"
+    generate_env
+  else
+    echo ".env file found."
+    if [ "$NON_INTERACTIVE" = true ]; then
+      echo "Non-interactive mode: skipping .env regeneration."
+      return
     fi
+    read -p "Do you want to regenerate the .env file? (y/n): " regenerate
+    if [ "$regenerate" == "y" ]; then
+      generate_env
+    fi
+  fi
 }
 
 # Add a flag to make the script non-interactive
 
 check_flags() {
-    while [[ "$#" -gt 0 ]]; do
-        case $1 in
-            --non-interactive) NON_INTERACTIVE=true ;;
-            --force) FORCE_REGENERATE=true ;;
-            --help) HELP=true ;;
-            -[a-zA-Z]*) 
-            local flags=${1#-}
-            for (( i=0; i<${#flags}; i++ )); do
-                local flag=${flags:$i:1}
-                case $flag in
-                    i) NON_INTERACTIVE=true ;;
-                    f) FORCE_REGENERATE=true ;;
-                    h) HELP=true ;;
-                    *) echo "Unknown flag: -${flags:$i:1}"; exit 1 ;;
-                esac
-            done
-            ;;
-            *) echo "Unknown parameter passed: $1"; exit 1 ;;
+  while [[ "$#" -gt 0 ]]; do
+    case $1 in
+    --non-interactive) NON_INTERACTIVE=true ;;
+    --force) FORCE_REGENERATE=true ;;
+    --help) HELP=true ;;
+    -[a-zA-Z]*)
+      local flags=${1#-}
+      for ((i = 0; i < ${#flags}; i++)); do
+        local flag=${flags:$i:1}
+        case $flag in
+        i) NON_INTERACTIVE=true ;;
+        f) FORCE_REGENERATE=true ;;
+        h) HELP=true ;;
+        *)
+          echo "Unknown flag: -${flags:$i:1}"
+          exit 1
+          ;;
         esac
-        shift
-    done
+      done
+      ;;
+    *)
+      echo "Unknown parameter passed: $1"
+      exit 1
+      ;;
+    esac
+    shift
+  done
 }
 
 check_flags "$@"
 if [ "$HELP" = true ]; then
-    echo "Usage: ./start.sh [options]"
-    echo "Options:"
-    echo "  -i, --non-interactive    Run the script in non-interactive mode (use default values)"
-    echo "  -f, --force              Force regeneration of the .env file"
-    echo "  -h, --help               Show this help message"
-    exit 0
+  echo "Usage: ./start.sh [options]"
+  echo "Options:"
+  echo "  -i, --non-interactive    Run the script in non-interactive mode (use default values)"
+  echo "  -f, --force              Force regeneration of the .env file"
+  echo "  -h, --help               Show this help message"
+  exit 0
 fi
 check_env
 docker compose -f $DIRPATH/docker-compose.yml up -d --build --remove-orphans

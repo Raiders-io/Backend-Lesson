@@ -3,7 +3,7 @@ import LessonHeader from '#models/lesson_header'
 import Tag from '#models/tag'
 import LessonOperations from '#service/lesson'
 import { getUsername } from '#middleware/verify_token_middleware'
-import type { UserInfo, LessonDataInterface } from '#utils/types'
+import type { LessonDataInterface } from '#utils/types'
 import { ErrorMessage } from '#utils/message'
 import User from '#models/user'
 import { lessonCreationValidator } from '#validators/lesson'
@@ -102,11 +102,11 @@ export default class LessonsController {
     let user = await User.find(userId)
     if (!user) {
       //In this case i may want to store the lesson and post a msg so when the user-service is up again it can tell me the relation
-      const userInfo: UserInfo | null = await getUsername(
+      const username = await getUsername(
         request.header('authorization')?.replace('Bearer ', '') ?? ''
       )
-      if (!userInfo) return response.internalServerError(ErrorMessage.User.Fetch)
-      user = await User.create({ id: userId, username: userInfo.username })
+      if (!username) return response.internalServerError(ErrorMessage.User.Fetch)
+      user = await User.create({ id: userId, username })
     }
 
     const slug = lessonData.title

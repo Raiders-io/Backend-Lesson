@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import env from '#start/env'
-import { UserInfo } from '#utils/types'
 
 async function verifyToken(token: string): Promise<string | null> {
   try {
@@ -17,15 +16,14 @@ async function verifyToken(token: string): Promise<string | null> {
   }
 }
 
-export async function getUsername(token: string): Promise<UserInfo | null> {
+export async function getUsername(token: string): Promise<string | null> {
   try {
-    const res = await fetch(`${env.get('AUTH_SERVICE_URL')}/api/v1/account/profile`, {
+    const res = await fetch(`${env.get('USER_SERVICE_URL')}/api/v1/profile/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!res.ok) return null
-    const body = (await res.json()) as { data: { id: string; fullName: string; email: string } }
-    body.data.fullName = body.data.fullName.replace(/\s+/g, '-') // Replace spaces with hyphens
-    return new UserInfo({ id: body.data.id, username: body.data.fullName, email: body.data.email })
+    const body = (await res.json()) as { data: { username: string } }
+    return body.data?.username
   } catch (error) {
     console.log('Error fetching username', error)
     return null
