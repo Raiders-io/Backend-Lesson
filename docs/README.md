@@ -80,7 +80,7 @@ Lesson-service/
 │   └── routes.ts             # Route definitions
 ├── bin/                      # Entry points
 ├── tests/                    # Test bootstrap
-├── dockerfile
+├── Dockerfile
 ├── setup.sh
 ├── package.json
 └── lesson_tags.csv           # Seed data for tags

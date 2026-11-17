@@ -22,7 +22,7 @@ export async function getUsername(token: string): Promise<string | null> {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!res.ok) return null
-    const body = await res.json() as { username: string }
+    const body = (await res.json()) as { username: string }
     return body.username
   } catch (error) {
     console.log('Error fetching username', error)

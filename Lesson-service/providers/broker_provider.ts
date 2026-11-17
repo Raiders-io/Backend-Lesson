@@ -4,26 +4,26 @@ import LessonOperations from '#service/lesson'
 import env from '#start/env'
 import { STREAM_NAME } from '#utils/types'
 import User from '#models/user'
-import { fileDeletedValidator, usernameUpdatedValidator } from '#validators/eventValidator'
+import { fileDeletedValidator, usernameUpdatedValidator } from '#validators/event_validator'
 import file from '#service/file'
 
 export default class BrokerProvider {
-  constructor(protected app: ApplicationService) { }
+  constructor(protected app: ApplicationService) {}
 
   /**
    * Register bindings to the container
    */
-  register() { }
+  register() {}
 
   /**
    * The container bindings have booted
    */
-  async boot() { }
+  async boot() {}
 
   /**
    * The application has been booted
    */
-  async start() { }
+  async start() {}
 
   /**
    * The process has been started

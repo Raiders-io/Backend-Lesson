@@ -193,7 +193,7 @@ The service registers a second consumer group on the `user.events` stream.
 ### `username.updated`
 
 When a user changes their username, the User Service emits this event. The Lesson Service validates
-the payload with VineJS (`app/validators/eventValidator.ts`) and updates the matching row in the local `users`
+the payload with VineJS (`app/validators/event_validator.ts`) and updates the matching row in the local `users`
 table. If the user does not exist locally, the event is ignored.
 
 **Consumed payload shape:**
@@ -215,7 +215,7 @@ table. If the user does not exist locally, the event is ignored.
 | `username` | String       |
 
 Source: [`providers/broker_provider.ts:55-70`](../Lesson-service/providers/broker_provider.ts),
-[`app/validators/eventValidator.ts:3-11`](../Lesson-service/app/validators/eventValidator.ts)
+[`app/validators/event_validator.ts:3-11`](../Lesson-service/app/validators/event_validator.ts)
 
 ## Consumed events (`object.events`)
 
@@ -225,7 +225,7 @@ the broker provider is ready (`objectConsumer.start()`).
 ### `object.file.deleted`
 
 Published by the Object Storage Service when a file is deleted by a user. The Lesson Service
-validates the payload with VineJS (`app/validators/eventValidator.ts`) and calls
+validates the payload with VineJS (`app/validators/event_validator.ts`) and calls
 `FileOperation.delete(filename, userId)`, which removes every `lesson_files` row for that filename
 belonging to lessons authored by `userId`. If no matching row exists, nothing happens — no
 `lesson.file.deleted` event is published.
@@ -252,7 +252,7 @@ stream (see [`file.deleted`](#filedeleted)).
 | `userId`   | UUID string |
 
 Source: [`providers/broker_provider.ts:72-79`](../Lesson-service/providers/broker_provider.ts),
-[`app/validators/eventValidator.ts:13-21`](../Lesson-service/app/validators/eventValidator.ts),
+[`app/validators/event_validator.ts:13-21`](../Lesson-service/app/validators/event_validator.ts),
 [`app/service/file.ts:37-51`](../Lesson-service/app/service/file.ts)
 
 ## TypeScript interfaces
