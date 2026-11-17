@@ -19,8 +19,12 @@ class FileOperation {
       return await LessonFile.createMany(payload, { client: trx })
     })
 
-    const event = EventGenerator.fileAttached(filenames, lessonId, lesson.authorId)
-    publish(STREAM_NAME, event, PublishOpt)
+    try {
+      const event = EventGenerator.fileAttached(filenames, lessonId, lesson.authorId)
+      publish(STREAM_NAME, event, PublishOpt)
+    } catch (error) {
+      console.error('Error occurred while publishing file attachment:', error)
+    }
     return record
   }
 
@@ -30,8 +34,12 @@ class FileOperation {
 
     await LessonFile.query().whereIn('filename', filenames).where('lesson_id', lessonId).delete()
 
-    const event = EventGenerator.fileDetached(filenames, lessonId, lesson.authorId)
-    publish(STREAM_NAME, event, PublishOpt)
+    try {
+      const event = EventGenerator.fileDetached(filenames, lessonId, lesson.authorId)
+      publish(STREAM_NAME, event, PublishOpt)
+    } catch (error) {
+      console.error('Error occurred while publishing file detachment:', error)
+    }
   }
 
   async delete(filename: string, userId: string) {
@@ -48,8 +56,12 @@ class FileOperation {
     // so the column is exposed using its snake_case database name.
     const lessonIds = matches.map((match) => match.lesson_id)
 
-    const event = EventGenerator.fileDeleted(filename, lessonIds, userId)
-    publish(STREAM_NAME, event, PublishOpt)
+    try {
+      const event = EventGenerator.fileDeleted(filename, lessonIds, userId)
+      publish(STREAM_NAME, event, PublishOpt)
+    } catch (error) {
+      console.error('Error occurred while publishing file deletion:', error)
+    }
   }
 
   async getByLessonId(lessonId: string) {

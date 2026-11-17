@@ -11,6 +11,16 @@ export const usernameUpdatedValidator = vine.create({
 })
 
 /**
+ * Payload of the `auth.user.deleted` event.
+ *
+ * Published when a user account is deleted. The Lesson Service removes every
+ * lesson authored by this user.
+ */
+export const userDeletedValidator = vine.create({
+  userId: vine.string().uuid(),
+})
+
+/**
  * Payload of the `object.file.deleted` event.
  *
  * Published when a file is deleted by a user.

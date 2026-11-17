@@ -6,8 +6,8 @@ export default class SearchesController {
     const title = request.input('title', '') || request.input('name', '')
     const tags: string[] = request.input('tags') ? [request.input('tags')].flat() : []
 
-    const page = request.input('page', 1)
-    const limit = request.input('limit', 10)
+    const page = Math.max(1, Number(request.input('page', 1)) || 1)
+    const limit = Math.min(Math.max(1, Number(request.input('limit', 10)) || 10), 100)
 
     const query = LessonHeader.query().preload('tags').preload('author')
 
