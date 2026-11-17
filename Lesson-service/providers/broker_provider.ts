@@ -3,6 +3,8 @@ import { Broker, consume, LOGLEVEL, publish } from '@yosone/broker'
 import LessonOperations from '#service/lesson'
 import env from '#start/env'
 import { STREAM_NAME } from '#utils/types'
+import User from '#models/user'
+import { usernameUpdatedValidator } from '#validators/user'
 
 export default class BrokerProvider {
   constructor(protected app: ApplicationService) {}
@@ -41,6 +43,7 @@ export default class BrokerProvider {
     })
 
     const authConsumer = consume('auth.events')
+    const userConsumer = consume('user.events')
 
     authConsumer.on('auth.user.deleted', async (event: any) => {
       const authorId: string = event.payload.userId
@@ -51,7 +54,25 @@ export default class BrokerProvider {
       console.log('auth.user.updated event received', event)
     })
 
+    userConsumer.on('username.updated', async (event: any) => {
+      try {
+        const payload = await usernameUpdatedValidator.validate(event.payload)
+        const user = await User.findBy('id', payload.userId)
+
+        if (!user) {
+          console.warn(`username.updated: user ${payload.userId} not found`)
+          return
+        }
+
+        user.username = payload.username
+        await user.save()
+      } catch (error) {
+        console.error('Error handling username.updated event:', error)
+      }
+    })
+
     authConsumer.start()
+    userConsumer.start()
   }
 
   /**

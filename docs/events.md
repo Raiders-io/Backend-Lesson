@@ -1,20 +1,20 @@
 # Events and Broker Contract
 
-The Lesson Service uses Redis Streams via `@yosone/broker`. It publishes its own lifecycle events on the `lesson.service` stream and consumes user lifecycle events from the `auth.events` stream.
+The Lesson Service uses Redis Streams via `@yosone/broker`. It publishes its own lifecycle events on the `lesson.service` stream and consumes user lifecycle events from the `auth.events` and `user.events` streams.
 
 ## Stream configuration
 
-| Setting | Value | Source |
-|---------|-------|--------|
-| Publish stream | `lesson.service` | [`app/utils/types.ts:5`](../Lesson-service/app/utils/types.ts) |
-| Consumer group | `CONSUMER_GROUP` env var | [`providers/broker_provider.ts:30`](../Lesson-service/providers/broker_provider.ts) |
-| Consumer name | `CONSUMER_NAME` env var | [`providers/broker_provider.ts:31`](../Lesson-service/providers/broker_provider.ts) |
-| Redis URL | `REDIS_HOST:REDIS_PORT` | [`providers/broker_provider.ts:32`](../Lesson-service/providers/broker_provider.ts) |
-| Log level | `LOGLEVEL.ERROR` | [`providers/broker_provider.ts:33`](../Lesson-service/providers/broker_provider.ts) |
-| Publish retry options | `{ retry: 3, retryTime: 1000 }` | [`app/utils/types.ts:8-11`](../Lesson-service/app/utils/types.ts) |
+| Setting               | Value                           | Source                                                                              |
+| --------------------- | ------------------------------- | ----------------------------------------------------------------------------------- |
+| Publish stream        | `lesson.service`                | [`app/utils/types.ts:5`](../Lesson-service/app/utils/types.ts)                      |
+| Consumer group        | `CONSUMER_GROUP` env var        | [`providers/broker_provider.ts:31`](../Lesson-service/providers/broker_provider.ts) |
+| Consumer name         | `CONSUMER_NAME` env var         | [`providers/broker_provider.ts:32`](../Lesson-service/providers/broker_provider.ts) |
+| Redis URL             | `REDIS_HOST:REDIS_PORT`         | [`providers/broker_provider.ts:33`](../Lesson-service/providers/broker_provider.ts) |
+| Log level             | `LOGLEVEL.ERROR`                | [`providers/broker_provider.ts:34`](../Lesson-service/providers/broker_provider.ts) |
+| Publish retry options | `{ retry: 3, retryTime: 1000 }` | [`app/utils/types.ts:8-11`](../Lesson-service/app/utils/types.ts)                   |
 
 The broker is initialised in the provider's `ready()` hook
-([`providers/broker_provider.ts:28-55`](../Lesson-service/providers/broker_provider.ts)).
+([`providers/broker_provider.ts:30-75`](../Lesson-service/providers/broker_provider.ts)).
 
 ## Published events (`lesson.service`)
 
@@ -32,7 +32,7 @@ Sent once when the broker provider boots, before any consumer starts.
 }
 ```
 
-Source: [`providers/broker_provider.ts:36-41`](../Lesson-service/providers/broker_provider.ts)
+Source: [`providers/broker_provider.ts:38-42`](../Lesson-service/providers/broker_provider.ts)
 
 ### `lesson.created`
 
@@ -184,26 +184,90 @@ related `lesson_tags` and `lesson_files` rows.
 }
 ```
 
-Source: [`providers/broker_provider.ts:45-48`](../Lesson-service/providers/broker_provider.ts)
+Source: [`providers/broker_provider.ts:48-51`](../Lesson-service/providers/broker_provider.ts)
 
 ### `auth.user.updated`
 
-Currently only logged; no local update is performed because the local `users` table only stores
-`id` and `username`.
+Currently only logged; no local update is performed because the Lesson Service does not keep any
+other auth-related fields locally.
 
-Source: [`providers/broker_provider.ts:50-52`](../Lesson-service/providers/broker_provider.ts)
+Source: [`providers/broker_provider.ts:53-55`](../Lesson-service/providers/broker_provider.ts)
+
+## Consumed events (`user.events`)
+
+The service registers a second consumer group on the `user.events` stream.
+
+### `username.updated`
+
+When a user changes their username, the User Service emits this event. The Lesson Service validates
+the payload with VineJS (`app/validators/user.ts`) and updates the matching row in the local `users`
+table. If the user does not exist locally, the event is ignored.
+
+**Consumed payload shape:**
+
+```json
+{
+  "payload": {
+    "userId": "<uuid>",
+    "username": "new-username"
+  }
+}
+```
+
+**Validation rules:**
+
+| Field      | Rule                                                         |
+| ---------- | ------------------------------------------------------------ |
+| `userId`   | UUID string                                                  |
+| `username` | String, 1–50 chars, alphanumeric with dashes and underscores |
+
+Source: [`providers/broker_provider.ts:57-71`](../Lesson-service/providers/broker_provider.ts),
+[`app/validators/user.ts`](../Lesson-service/app/validators/user.ts)
 
 ## TypeScript interfaces
 
 The event interfaces live in [`app/utils/types.ts:39-94`](../Lesson-service/app/utils/types.ts):
 
 ```ts
-interface LessonCreatedEvent { payload: { lessonId: string; authorId: string; date: Date }; type: string }
-interface LessonDeletedEvent { payload: { lessonId: string | string[]; authorId: string; date: Date }; type: string }
-interface LessonUpdatedEvent { payload: { lessonId: string; authorId: string; date: Date }; type: string }
-interface FileAttachedEvent  { payload: { filename: string | string[]; lessonId: string; authorId: string; date: Date }; type: string }
-interface FileDetachedEvent  { payload: { filename: string | string[]; lessonId: string | string[]; authorId: string; date: Date }; type: string }
-interface FileDeletedEvent   { payload: { filename: string; lessonId: string | string[]; authorId: string; date: Date }; type: string }
+interface LessonCreatedEvent {
+  payload: { lessonId: string; authorId: string; date: Date };
+  type: string;
+}
+interface LessonDeletedEvent {
+  payload: { lessonId: string | string[]; authorId: string; date: Date };
+  type: string;
+}
+interface LessonUpdatedEvent {
+  payload: { lessonId: string; authorId: string; date: Date };
+  type: string;
+}
+interface FileAttachedEvent {
+  payload: {
+    filename: string | string[];
+    lessonId: string;
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
+interface FileDetachedEvent {
+  payload: {
+    filename: string | string[];
+    lessonId: string | string[];
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
+interface FileDeletedEvent {
+  payload: {
+    filename: string;
+    lessonId: string | string[];
+    authorId: string;
+    date: Date;
+  };
+  type: string;
+}
 ```
 
 ## Failure handling
