@@ -1,4 +1,3 @@
-import Tag from '#models/tag'
 import env from '#start/env'
 import type { PublishOptions } from '@yosone/broker'
 
@@ -30,7 +29,7 @@ export class UserInfo implements UserInfoInterface {
 
 export interface LessonDataInterface {
   title?: string
-  tags?: Tag[]
+  tags?: { id: number }[]
   privacy?: boolean
   description?: string
   username?: string

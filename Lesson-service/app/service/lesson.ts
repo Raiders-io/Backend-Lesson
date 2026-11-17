@@ -55,7 +55,10 @@ export class LessonOperations {
       .delete()
       .returning('lesson_id')
     if (!lessons || lessons.length === 0) return
-    const event = EventGenerator.lessonDeleted(lessons, authorId)
+    // Write queries bypass Lucid's model hydration and return raw driver rows,
+    // so the column is exposed using its snake_case database name.
+    const lessonIds = lessons.map((lesson) => lesson.lesson_id)
+    const event = EventGenerator.lessonDeleted(lessonIds, authorId)
     publish(STREAM_NAME, event, PublishOpt)
   }
 
@@ -97,7 +100,10 @@ export class LessonOperations {
   }
 
   async getLessonByAuthor(authorId: string, userId?: string) {
-    const lessons = await LessonHeader.query().where('author_id', authorId).preload('tags').preload('author')
+    const lessons = await LessonHeader.query()
+      .where('author_id', authorId)
+      .preload('tags')
+      .preload('author')
 
     return filterPrivate(lessons, userId)
   }

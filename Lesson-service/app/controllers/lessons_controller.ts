@@ -6,8 +6,8 @@ import { getUsername } from '#middleware/verify_token_middleware'
 import type { LessonDataInterface } from '#utils/types'
 import { ErrorMessage } from '#utils/message'
 import User from '#models/user'
-import { lessonCreationValidator } from '#validators/lesson'
-
+import { lessonCreationValidator, lessonUpdateValidator } from '#validators/lesson'
+import { isUniqueViolation } from '#utils/errors'
 
 //TODO maybe do a function for the try catch msg
 export default class LessonsController {
@@ -21,9 +21,10 @@ export default class LessonsController {
       try {
         const lesson = await LessonOperations.getLessonByAuthor(authorId, authorId)
         return lesson
-
-      } catch (err) {
-        return err instanceof Error
+      } catch (error) {
+        return response.internalServerError(
+          error instanceof Error ? { error: error.message } : { error: 'Failed to fetch lessons' }
+        )
       }
     }
     const lessons = await LessonHeader.query().preload('tags').where('isPrivate', false)
@@ -136,6 +137,9 @@ export default class LessonsController {
 
       return response.created({ lessonId })
     } catch (error) {
+      if (isUniqueViolation(error)) {
+        return response.conflict(ErrorMessage.Lessons.Collision)
+      }
       return response.badRequest(ErrorMessage.Lessons.BadRequest)
     }
   }
@@ -156,10 +160,13 @@ export default class LessonsController {
       return response.notFound(ErrorMessage.Lessons.NotFound)
     }
 
-    const lessonDataInterface = request.only(['title', 'tags', 'description', 'privacy'])
+    const lessonDataInterface = await request.validateUsing(lessonUpdateValidator)
     try {
       await LessonOperations.updateLesson(lesson, lessonDataInterface)
     } catch (error) {
+      if (isUniqueViolation(error)) {
+        return response.conflict(ErrorMessage.Lessons.Collision)
+      }
       return response.badRequest(
         error instanceof Error ? { error: error.message } : { error: 'Failed to update lesson' }
       )
@@ -176,17 +183,15 @@ export default class LessonsController {
     if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
     if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
-    const lessonUpdateData: LessonDataInterface = request.only([
-      'title',
-      'tags',
-      'privacy',
-      'description',
-    ])
+    const lessonUpdateData: LessonDataInterface = await request.validateUsing(lessonUpdateValidator)
 
     await lesson.load('tags')
     try {
       await LessonOperations.updateLesson(lesson, lessonUpdateData)
     } catch (error) {
+      if (isUniqueViolation(error)) {
+        return response.conflict(ErrorMessage.Lessons.Collision)
+      }
       return response.badRequest(
         error instanceof Error ? { error: error.message } : { error: 'Failed to update lesson' }
       )
@@ -214,7 +219,7 @@ export default class LessonsController {
 
     const lesson = await LessonHeader.query()
       .where('author_id', authorId)
-      .where('content', params.content)
+      .where('slug', params.content)
       .first()
     if (!lesson) {
       return response.notFound(ErrorMessage.Lessons.NotFound)

@@ -15,10 +15,27 @@ export const lessonCreationValidator = vine.create({
     })
     .minLength(1)
     .maxLength(100),
-  description: vine
-    .string()
-    .maxLength(500)
-    .optional(),
+  description: vine.string().maxLength(500).optional(),
   privacy: vine.boolean(),
   tags: vine.array(tagsSchema).minLength(1).maxLength(10),
+})
+
+/**
+ * Partial update payload: every field is optional, but when provided it must
+ * match the same shape as the creation payload.
+ */
+export const lessonUpdateValidator = vine.create({
+  title: vine
+    .string()
+    .alphaNumeric({
+      allowDashes: true,
+      allowSpaces: true,
+      allowUnderscores: true,
+    })
+    .minLength(1)
+    .maxLength(100)
+    .optional(),
+  description: vine.string().maxLength(500).optional(),
+  privacy: vine.boolean().optional(),
+  tags: vine.array(tagsSchema).minLength(1).maxLength(10).optional(),
 })

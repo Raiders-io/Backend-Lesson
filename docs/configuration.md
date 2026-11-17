@@ -121,7 +121,7 @@ Source: [`start/env.ts`](../Lesson-service/start/env.ts)
 
 The compose file defines two services:
 
-- **`lesson-api`** — builds the `lesson_api:local` image from `Lesson-service/dockerfile` and
+- **`lesson-api`** — builds the `lesson_api:local` image from `Lesson-service/Dockerfile` and
   exposes `${PORT}:3333`.
 - **`postgresql`** — runs `postgres:18.4-alpine3.23` with a persistent `pg-data` volume.
 
@@ -132,7 +132,7 @@ Networks:
 
 Source: [`docker-compose.yml`](../docker-compose.yml)
 
-### `Lesson-service/dockerfile`
+### `Lesson-service/Dockerfile`
 
 Multi-stage build:
 
@@ -142,7 +142,7 @@ Multi-stage build:
 4. **`production`** — copies the build output, `setup.sh`, and `lesson_tags.csv`; runs
    `npm ci --omit=dev`; exposes port `3333`; entrypoint is `/app/setup.sh`.
 
-Source: [`Lesson-service/dockerfile`](../Lesson-service/dockerfile)
+Source: [`Lesson-service/Dockerfile`](../Lesson-service/Dockerfile)
 
 ### `setup.sh`
 

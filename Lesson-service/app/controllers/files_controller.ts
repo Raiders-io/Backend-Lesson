@@ -47,7 +47,7 @@ export default class FilesController {
     const { files } = await request.validateUsing(fileDataValidator)
     const userId = request.ctx?.userId ?? ''
 
-    const lesson = await LessonOperations.getLessonById(lessonId)
+    const lesson = await LessonOperations.getLessonById(lessonId, userId)
     if (!lesson) return response.notFound(`${ErrorMessage.File.RelatedLesson}`)
     if (lesson.authorId !== userId) return response.forbidden(`${ErrorMessage.User.IdMatching}`)
     if (!files || files.length === 0) return response.badRequest(`${ErrorMessage.File.NoFile}`)
@@ -57,7 +57,7 @@ export default class FilesController {
 
     if (ownership.found.length === 0) return response.forbidden(`${ErrorMessage.File.Ownership}`)
 
-    return await FileOperation.attach(ownership.found, lessonId)
+    return await FileOperation.attach(ownership.found, lessonId, userId)
   }
 
   /**
@@ -92,7 +92,7 @@ export default class FilesController {
     const { files } = await request.validateUsing(fileDataValidator)
     const userId = request.ctx?.userId ?? ''
 
-    const lesson = await LessonOperations.getLessonById(lessonId)
+    const lesson = await LessonOperations.getLessonById(lessonId, userId)
     if (!lesson) return response.notFound(`${ErrorMessage.File.RelatedLesson}`)
     if (lesson.authorId !== userId) return response.forbidden(`${ErrorMessage.User.IdMatching}`)
     if (!files || files.length === 0) return response.badRequest(`${ErrorMessage.File.NoFile}`)
@@ -103,7 +103,7 @@ export default class FilesController {
 
     // if (ownership.found.length === 0) return response.forbidden(`${ErrorMessage.File.Ownership}`)
 
-    return await FileOperation.detach(files, lessonId)
+    return await FileOperation.detach(files, lessonId, userId)
   }
 
   /*

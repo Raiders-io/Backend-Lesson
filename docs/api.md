@@ -259,10 +259,8 @@ Source: [`lessons_controller.ts:146-168`](../Lesson-service/app/controllers/less
 
 ### `DELETE /lessons/cnt/:author/:content`
 
-Delete a lesson by author username and slug.
-
-> **Known issue:** the controller queries `.where('content', params.content)`, but the table has no `content` column; it likely intended to query by `slug`. As written, this endpoint will usually
-> return `404 Not Found`.
+Delete a lesson by author username and slug. The `:content` path parameter is matched against the
+lesson `slug`.
 
 **Response (`200 OK`):**
 
@@ -273,7 +271,7 @@ Delete a lesson by author username and slug.
 **Errors:**
 
 - `401 Unauthorized` — caller is not authenticated.
-- `404 Not Found` — lesson not found (or the column mismatch prevents a match).
+- `404 Not Found` — lesson not found.
 
 Source: [`lessons_controller.ts:211-225`](../Lesson-service/app/controllers/lessons_controller.ts)
 

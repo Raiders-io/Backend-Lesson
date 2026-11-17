@@ -9,13 +9,17 @@ import { defineConfig } from '@adonisjs/cors'
 const corsConfig = defineConfig({
   /**
    * Enable or disable CORS handling globally.
+   *
+   * CORS stays disabled on purpose: this service is only reachable through
+   * the API gateway, which is responsible for applying the browser CORS
+   * policy. The options below are therefore not in effect; if CORS is ever
+   * enabled here, replace the wildcard origin with an explicit allowlist
+   * before keeping `credentials: true`.
    */
   enabled: false,
 
   /**
-   * In development, allow every origin to simplify local front/backend setup.
-   * In production, keep an explicit allowlist (empty by default, so no
-   * cross-origin browser access is allowed until configured).
+   * Not used while CORS is disabled (see above).
    */
   origin: '*',
 
