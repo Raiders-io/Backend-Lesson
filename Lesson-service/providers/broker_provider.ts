@@ -4,25 +4,26 @@ import LessonOperations from '#service/lesson'
 import env from '#start/env'
 import { STREAM_NAME } from '#utils/types'
 import User from '#models/user'
-import { usernameUpdatedValidator } from '#validators/user'
+import { fileDeletedValidator, usernameUpdatedValidator } from '#validators/eventValidator'
+import file from '#service/file'
 
 export default class BrokerProvider {
-  constructor(protected app: ApplicationService) {}
+  constructor(protected app: ApplicationService) { }
 
   /**
    * Register bindings to the container
    */
-  register() {}
+  register() { }
 
   /**
    * The container bindings have booted
    */
-  async boot() {}
+  async boot() { }
 
   /**
    * The application has been booted
    */
-  async start() {}
+  async start() { }
 
   /**
    * The process has been started
@@ -44,14 +45,11 @@ export default class BrokerProvider {
 
     const authConsumer = consume('auth.events')
     const userConsumer = consume('user.events')
+    const objectConsumer = consume('object.events')
 
     authConsumer.on('auth.user.deleted', async (event: any) => {
       const authorId: string = event.payload.userId
       if (authorId) await LessonOperations.deleteLessonsByAuthor(authorId)
-    })
-
-    authConsumer.on('auth.user.updated', async (event: any) => {
-      console.log('auth.user.updated event received', event)
     })
 
     userConsumer.on('username.updated', async (event: any) => {
@@ -71,8 +69,18 @@ export default class BrokerProvider {
       }
     })
 
+    objectConsumer.on('object.file.deleted', async (event: any) => {
+      try {
+        const payload = await fileDeletedValidator.validate(event.payload)
+        await file.delete(payload.filename, payload.userId)
+      } catch (error) {
+        console.error('Error handling object.file.deleted event:', error)
+      }
+    })
+
     authConsumer.start()
     userConsumer.start()
+    objectConsumer.start()
   }
 
   /**

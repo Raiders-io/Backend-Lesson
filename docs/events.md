@@ -1,20 +1,20 @@
 # Events and Broker Contract
 
-The Lesson Service uses Redis Streams via `@yosone/broker`. It publishes its own lifecycle events on the `lesson.service` stream and consumes user lifecycle events from the `auth.events` and `user.events` streams.
+The Lesson Service uses Redis Streams via `@yosone/broker`. It publishes its own lifecycle events on the `lesson.service` stream and consumes user and object lifecycle events from the `auth.events`, `user.events` and `object.events` streams.
 
 ## Stream configuration
 
 | Setting               | Value                           | Source                                                                              |
 | --------------------- | ------------------------------- | ----------------------------------------------------------------------------------- |
 | Publish stream        | `lesson.service`                | [`app/utils/types.ts:5`](../Lesson-service/app/utils/types.ts)                      |
-| Consumer group        | `CONSUMER_GROUP` env var        | [`providers/broker_provider.ts:31`](../Lesson-service/providers/broker_provider.ts) |
-| Consumer name         | `CONSUMER_NAME` env var         | [`providers/broker_provider.ts:32`](../Lesson-service/providers/broker_provider.ts) |
-| Redis URL             | `REDIS_HOST:REDIS_PORT`         | [`providers/broker_provider.ts:33`](../Lesson-service/providers/broker_provider.ts) |
-| Log level             | `LOGLEVEL.ERROR`                | [`providers/broker_provider.ts:34`](../Lesson-service/providers/broker_provider.ts) |
+| Consumer group        | `CONSUMER_GROUP` env var        | [`providers/broker_provider.ts:33`](../Lesson-service/providers/broker_provider.ts) |
+| Consumer name         | `CONSUMER_NAME` env var         | [`providers/broker_provider.ts:34`](../Lesson-service/providers/broker_provider.ts) |
+| Redis URL             | `REDIS_HOST:REDIS_PORT`         | [`providers/broker_provider.ts:35`](../Lesson-service/providers/broker_provider.ts) |
+| Log level             | `LOGLEVEL.ERROR`                | [`providers/broker_provider.ts:36`](../Lesson-service/providers/broker_provider.ts) |
 | Publish retry options | `{ retry: 3, retryTime: 1000 }` | [`app/utils/types.ts:8-11`](../Lesson-service/app/utils/types.ts)                   |
 
 The broker is initialised in the provider's `ready()` hook
-([`providers/broker_provider.ts:30-75`](../Lesson-service/providers/broker_provider.ts)).
+([`providers/broker_provider.ts:31-84`](../Lesson-service/providers/broker_provider.ts)).
 
 ## Published events (`lesson.service`)
 
@@ -32,7 +32,7 @@ Sent once when the broker provider boots, before any consumer starts.
 }
 ```
 
-Source: [`providers/broker_provider.ts:38-42`](../Lesson-service/providers/broker_provider.ts)
+Source: [`providers/broker_provider.ts:39-44`](../Lesson-service/providers/broker_provider.ts)
 
 ### `lesson.created`
 
@@ -184,14 +184,7 @@ related `lesson_tags` and `lesson_files` rows.
 }
 ```
 
-Source: [`providers/broker_provider.ts:48-51`](../Lesson-service/providers/broker_provider.ts)
-
-### `auth.user.updated`
-
-Currently only logged; no local update is performed because the Lesson Service does not keep any
-other auth-related fields locally.
-
-Source: [`providers/broker_provider.ts:53-55`](../Lesson-service/providers/broker_provider.ts)
+Source: [`providers/broker_provider.ts:50-53`](../Lesson-service/providers/broker_provider.ts)
 
 ## Consumed events (`user.events`)
 
@@ -200,7 +193,7 @@ The service registers a second consumer group on the `user.events` stream.
 ### `username.updated`
 
 When a user changes their username, the User Service emits this event. The Lesson Service validates
-the payload with VineJS (`app/validators/user.ts`) and updates the matching row in the local `users`
+the payload with VineJS (`app/validators/eventValidator.ts`) and updates the matching row in the local `users`
 table. If the user does not exist locally, the event is ignored.
 
 **Consumed payload shape:**
@@ -216,13 +209,51 @@ table. If the user does not exist locally, the event is ignored.
 
 **Validation rules:**
 
-| Field      | Rule                                                         |
-| ---------- | ------------------------------------------------------------ |
-| `userId`   | UUID string                                                  |
-| `username` | String, 1–50 chars, alphanumeric with dashes and underscores |
+| Field      | Rule         |
+| ---------- | ------------ |
+| `userId`   | UUID string  |
+| `username` | String       |
 
-Source: [`providers/broker_provider.ts:57-71`](../Lesson-service/providers/broker_provider.ts),
-[`app/validators/user.ts`](../Lesson-service/app/validators/user.ts)
+Source: [`providers/broker_provider.ts:55-70`](../Lesson-service/providers/broker_provider.ts),
+[`app/validators/eventValidator.ts:3-11`](../Lesson-service/app/validators/eventValidator.ts)
+
+## Consumed events (`object.events`)
+
+The service registers a third consumer group on the `object.events` stream. It is only started when
+the broker provider is ready (`objectConsumer.start()`).
+
+### `object.file.deleted`
+
+Published by the Object Storage Service when a file is deleted by a user. The Lesson Service
+validates the payload with VineJS (`app/validators/eventValidator.ts`) and calls
+`FileOperation.delete(filename, userId)`, which removes every `lesson_files` row for that filename
+belonging to lessons authored by `userId`. If no matching row exists, nothing happens — no
+`lesson.file.deleted` event is published.
+
+When rows are removed, the service republishes `lesson.file.deleted` on its own `lesson.service`
+stream (see [`file.deleted`](#filedeleted)).
+
+**Consumed payload shape:**
+
+```json
+{
+  "payload": {
+    "filename": "CV.pdf",
+    "userId": "<uuid>"
+  }
+}
+```
+
+**Validation rules:**
+
+| Field      | Rule        |
+| ---------- | ----------- |
+| `filename` | String      |
+| `userId`   | UUID string |
+
+Source: [`providers/broker_provider.ts:72-79`](../Lesson-service/providers/broker_provider.ts),
+[`app/validators/eventValidator.ts:13-21`](../Lesson-service/app/validators/eventValidator.ts),
+[`app/service/file.ts:37-51`](../Lesson-service/app/service/file.ts)
 
 ## TypeScript interfaces
 
