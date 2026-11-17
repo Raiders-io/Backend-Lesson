@@ -4,7 +4,11 @@ import LessonOperations from '#service/lesson'
 import env from '#start/env'
 import { STREAM_NAME } from '#utils/types'
 import User from '#models/user'
-import { fileDeletedValidator, usernameUpdatedValidator } from '#validators/event_validator'
+import {
+  fileDeletedValidator,
+  userDeletedValidator,
+  usernameUpdatedValidator,
+} from '#validators/event_validator'
 import file from '#service/file'
 
 export default class BrokerProvider {
@@ -48,8 +52,12 @@ export default class BrokerProvider {
     const objectConsumer = consume('object.events')
 
     authConsumer.on('auth.user.deleted', async (event: any) => {
-      const authorId: string = event.payload.userId
-      if (authorId) await LessonOperations.deleteLessonsByAuthor(authorId)
+      try {
+        const payload = await userDeletedValidator.validate(event.payload)
+        await LessonOperations.deleteLessonsByAuthor(payload.userId)
+      } catch (error) {
+        console.error('Error handling auth.user.deleted event:', error)
+      }
     })
 
     userConsumer.on('username.updated', async (event: any) => {

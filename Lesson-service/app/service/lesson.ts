@@ -4,6 +4,7 @@ import { publish } from '@yosone/broker'
 import { STREAM_NAME, PublishOpt, type LessonDataInterface } from '#utils/types'
 import { ErrorMessage } from '#utils/message'
 import EventGenerator from '#service/event'
+import { slugify } from '#utils/slug'
 
 //TODO add check for privacy setting in all getter
 //TODO add preload for the file
@@ -58,17 +59,20 @@ export class LessonOperations {
     // Write queries bypass Lucid's model hydration and return raw driver rows,
     // so the column is exposed using its snake_case database name.
     const lessonIds = lessons.map((lesson) => lesson.lesson_id)
-    const event = EventGenerator.lessonDeleted(lessonIds, authorId)
-    publish(STREAM_NAME, event, PublishOpt)
+    try {
+      const event = EventGenerator.lessonDeleted(lessonIds, authorId)
+      publish(STREAM_NAME, event, PublishOpt)
+    } catch (error) {
+      console.error('Error occurred while publishing bulk lesson deletion:', error)
+    }
   }
 
   async updateLesson(lesson: LessonHeader, lessonData: LessonDataInterface) {
     lesson.title = lessonData.title ?? lesson.title
     if (lessonData.title) {
-      lesson.slug = lessonData.title
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
+      const slug = slugify(lessonData.title)
+      if (!slug) throw new Error(ErrorMessage.Lessons.NoTitle)
+      lesson.slug = slug
     }
 
     const duplicate = await LessonHeader.query()

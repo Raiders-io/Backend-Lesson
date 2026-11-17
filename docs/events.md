@@ -184,7 +184,11 @@ related `lesson_tags` and `lesson_files` rows.
 }
 ```
 
-Source: [`providers/broker_provider.ts:50-53`](../Lesson-service/providers/broker_provider.ts)
+The payload is validated with VineJS
+([`app/validators/event_validator.ts`](../Lesson-service/app/validators/event_validator.ts)); invalid
+payloads and handler errors are logged and the event is dropped.
+
+Source: [`providers/broker_provider.ts:54-61`](../Lesson-service/providers/broker_provider.ts)
 
 ## Consumed events (`user.events`)
 

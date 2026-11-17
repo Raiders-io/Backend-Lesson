@@ -4,10 +4,11 @@ Base URL: `http://localhost:3333/api/v1`
 
 All endpoints are mounted under `/api/v1` and protected by the `verifyToken()` middleware
 ([`start/routes.ts:63`](../Lesson-service/start/routes.ts)). The middleware sets `ctx.userId` from
-the auth-service token, so the service can enforce ownership. Responses are serialized by the custom
-`ApiSerializer` in [`providers/api_provider.ts`](../Lesson-service/providers/api_provider.ts),
-which wraps payloads under `data` for objects/arrays and exposes pagination metadata for Lucid
-paginators.
+the auth-service token, so the service can enforce ownership. Controllers return plain JSON
+payloads (AdonisJS serializes Lucid models directly); the custom `ApiSerializer` in
+[`providers/api_provider.ts`](../Lesson-service/providers/api_provider.ts) is registered but not
+applied to these responses. The exception is `GET /search`, whose Lucid paginator shape includes
+`data` plus pagination metadata.
 
 ## Route overview
 
@@ -78,23 +79,21 @@ List lessons.
 **Response (`200 OK`):**
 
 ```json
-{
-  "data": [
-    {
-      "lessonId": "uuid",
-      "title": "...",
-      "slug": "...",
-      "description": "...",
-      "authorId": "uuid",
-      "isPrivate": false,
-      "pertinence": 0,
-      "createdAt": "...",
-      "updatedAt": "...",
-      "tags": [ { "id": 1, "name": "javascript" } ],
-      "author": { "id": "uuid", "username": "..." }
-    }
-  ]
-}
+[
+  {
+    "lessonId": "uuid",
+    "title": "...",
+    "slug": "...",
+    "description": "...",
+    "authorId": "uuid",
+    "isPrivate": false,
+    "pertinence": 0,
+    "createdAt": "...",
+    "updatedAt": "...",
+    "tags": [ { "id": 1, "name": "javascript" } ],
+    "author": { "id": "uuid", "username": "..." }
+  }
+]
 ```
 
 Source: [`lessons_controller.ts:17-30`](../Lesson-service/app/controllers/lessons_controller.ts)
@@ -136,7 +135,8 @@ Validation rules ([`app/validators/lesson.ts`](../Lesson-service/app/validators/
 - `401 Unauthorized` — caller is not authenticated.
 - `500 Internal Server Error` — user service could not be reached to backfill the local `users` table.
 - `409 Conflict` — a lesson with the same slug already exists for this author.
-- `400 Bad Request` — validation failed.
+- `422 Unprocessable Entity` — the request body failed validation.
+- `400 Bad Request` — the lesson could not be saved.
 
 **Notes:**
 
@@ -184,8 +184,10 @@ Update a lesson by UUID. Only the lesson author may update.
 **Errors:**
 
 - `401 Unauthorized` — caller is not authenticated.
-- `403 Forbidden` — caller is not the author.
-- `400 Bad Request` — validation/save error (body contains `error` message).
+- `403 Forbidden` — caller is not the lesson author.
+- `409 Conflict` — another lesson of this author already uses the new slug.
+- `422 Unprocessable Entity` — the request body failed validation.
+- `400 Bad Request` — the update could not be saved.
 
 Source: [`lessons_controller.ts:172-195`](../Lesson-service/app/controllers/lessons_controller.ts)
 
@@ -252,8 +254,11 @@ Update a lesson by author username and slug. Only the authenticated author may u
 **Errors:**
 
 - `401 Unauthorized` — caller is not authenticated.
-- `404 Not Found` — lesson not found.
-- `400 Bad Request` — update failed.
+- `403 Forbidden` — caller is not the author named in the path.
+- `404 Not Found` — author or lesson not found.
+- `409 Conflict` — another lesson of this author already uses the new slug.
+- `422 Unprocessable Entity` — the request body failed validation.
+- `400 Bad Request` — the update could not be saved.
 
 Source: [`lessons_controller.ts:146-168`](../Lesson-service/app/controllers/lessons_controller.ts)
 
@@ -271,7 +276,8 @@ lesson `slug`.
 **Errors:**
 
 - `401 Unauthorized` — caller is not authenticated.
-- `404 Not Found` — lesson not found.
+- `403 Forbidden` — caller is not the author named in the path.
+- `404 Not Found` — author or lesson not found.
 
 Source: [`lessons_controller.ts:211-225`](../Lesson-service/app/controllers/lessons_controller.ts)
 
@@ -291,11 +297,9 @@ List all files attached to a lesson.
 **Response (`200 OK`):**
 
 ```json
-{
-  "data": [
-    { "filename": "CV.pdf", "lessonId": "uuid", "createdAt": "...", "updatedAt": "..." }
-  ]
-}
+[
+  { "filename": "CV.pdf", "lessonId": "uuid", "createdAt": "...", "updatedAt": "..." }
+]
 ```
 
 **Errors:**
@@ -361,7 +365,7 @@ Fetch a single attached file record.
 - `id` — lesson UUID.
 - `file` — filename.
 
-**Response (`200 OK`):** `{ "data": { "filename": "...", "lessonId": "..." } }`
+**Response (`200 OK`):** `{ "filename": "...", "lessonId": "..." }`
 
 **Errors:**
 
@@ -408,7 +412,7 @@ Search public lessons by title and/or tags, with pagination and sorting.
 | `title` or `name` | string | — | Case-insensitive substring match on `title` (`ILIKE`). |
 | `tags` | string or array | — | Tag names. Multiple values are combined with AND logic. |
 | `page` | integer | `1` | Page number. |
-| `limit` | integer | `10` | Items per page. |
+| `limit` | integer | `10` | Items per page, clamped to 1–100. |
 | `sortBy` | string | `created_at` | One of `created_at`, `updated_at`, `title`, `name` (alias for `title`), `pertinence`. |
 | `direction` | string | `desc` | `asc` or `desc`. |
 
@@ -471,6 +475,7 @@ curl -X POST http://localhost:3333/api/v1/lessons \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Based WWorld",
+    "privacy": false,
     "tags": [ { "id": 1, "name": "javascript" } ]
   }'
 ```

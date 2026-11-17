@@ -8,6 +8,7 @@ import { ErrorMessage } from '#utils/message'
 import User from '#models/user'
 import { lessonCreationValidator, lessonUpdateValidator } from '#validators/lesson'
 import { isUniqueViolation } from '#utils/errors'
+import { slugify } from '#utils/slug'
 
 //TODO maybe do a function for the try catch msg
 export default class LessonsController {
@@ -110,10 +111,8 @@ export default class LessonsController {
       user = await User.create({ id: userId, username })
     }
 
-    const slug = lessonData.title
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')
+    const slug = slugify(lessonData.title)
+    if (!slug) return response.badRequest(ErrorMessage.Lessons.NoTitle)
 
     const lessonModel = new LessonHeader()
 
@@ -151,8 +150,12 @@ export default class LessonsController {
     const authorId = request.ctx?.userId
     if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
 
+    const author = await User.query().where('username', params.author).first()
+    if (!author) return response.notFound(ErrorMessage.Lessons.NotFoundAuthor)
+    if (author.id !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
+
     const lesson = await LessonHeader.query()
-      .where('author_id', authorId)
+      .where('author_id', author.id)
       .where('slug', params.content)
       .preload('tags')
       .first()
@@ -164,7 +167,10 @@ export default class LessonsController {
     try {
       await LessonOperations.updateLesson(lesson, lessonDataInterface)
     } catch (error) {
-      if (isUniqueViolation(error)) {
+      if (
+        isUniqueViolation(error) ||
+        (error instanceof Error && error.message === ErrorMessage.Lessons.Collision)
+      ) {
         return response.conflict(ErrorMessage.Lessons.Collision)
       }
       return response.badRequest(
@@ -177,10 +183,10 @@ export default class LessonsController {
    * Handle form submission for the edit action
    */
   async updateById({ params, request, response }: HttpContext) {
-    const lesson = await LessonHeader.findOrFail(params.id)
-
     const authorId = request.ctx?.userId
     if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
+
+    const lesson = await LessonHeader.findOrFail(params.id)
     if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
     const lessonUpdateData: LessonDataInterface = await request.validateUsing(lessonUpdateValidator)
@@ -189,7 +195,10 @@ export default class LessonsController {
     try {
       await LessonOperations.updateLesson(lesson, lessonUpdateData)
     } catch (error) {
-      if (isUniqueViolation(error)) {
+      if (
+        isUniqueViolation(error) ||
+        (error instanceof Error && error.message === ErrorMessage.Lessons.Collision)
+      ) {
         return response.conflict(ErrorMessage.Lessons.Collision)
       }
       return response.badRequest(
@@ -203,10 +212,10 @@ export default class LessonsController {
    * Delete record
    */
   async destroyById({ request, params, response }: HttpContext) {
-    const lesson = await LessonHeader.findOrFail(params.id)
-
     const authorId = request.ctx?.userId
     if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
+
+    const lesson = await LessonHeader.findOrFail(params.id)
     if (lesson.authorId !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
 
     await LessonOperations.deleteLessonById(lesson.lessonId)
@@ -217,8 +226,12 @@ export default class LessonsController {
     const authorId = request.ctx?.userId
     if (!authorId) return response.unauthorized(ErrorMessage.User.Logout)
 
+    const author = await User.query().where('username', params.author).first()
+    if (!author) return response.notFound(ErrorMessage.Lessons.NotFoundAuthor)
+    if (author.id !== authorId) return response.forbidden(ErrorMessage.Lessons.NotAllowed)
+
     const lesson = await LessonHeader.query()
-      .where('author_id', authorId)
+      .where('author_id', author.id)
       .where('slug', params.content)
       .first()
     if (!lesson) {

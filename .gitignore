@@ -26,3 +26,8 @@ yarn-error.log
 .DS_Store
 
 postgresql-data
+
+# Lesson-service local artifacts
+Lesson-service/tmp/*
+!Lesson-service/tmp/.gitkeep
+Lesson-service/database/schema/pg-schema.sql
