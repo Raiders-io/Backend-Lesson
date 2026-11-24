@@ -59,6 +59,7 @@ export default class LessonsController {
   async showByAuthor({ request, params, response }: HttpContext) {
     const authorId = await User.query()
       .where('username', params.author)
+      .orWhere('id', params.author)
       .firstOrFail()
       .then((user) => user.id)
 

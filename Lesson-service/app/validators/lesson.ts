@@ -5,16 +5,13 @@ export const tagsSchema = vine.object({
   id: vine.number(),
 })
 
+
+//TODO Change if wanted to add html/markdown in title/desctiption
 export const lessonCreationValidator = vine.create({
   title: vine
     .string()
-    .alphaNumeric({
-      allowDashes: true,
-      allowSpaces: true,
-      allowUnderscores: true,
-    })
     .minLength(1)
-    .maxLength(100),
+    .maxLength(150),
   description: vine.string().maxLength(500).optional(),
   privacy: vine.boolean(),
   tags: vine.array(tagsSchema).minLength(1).maxLength(10),
@@ -27,11 +24,6 @@ export const lessonCreationValidator = vine.create({
 export const lessonUpdateValidator = vine.create({
   title: vine
     .string()
-    .alphaNumeric({
-      allowDashes: true,
-      allowSpaces: true,
-      allowUnderscores: true,
-    })
     .minLength(1)
     .maxLength(100)
     .optional(),

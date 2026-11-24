@@ -27,7 +27,7 @@ CONSUMER="lesson-service-consumer"
 REDIS_URL=redis://redis:6379
 
 # Services URLs
-FILE_SERVICE_URL=http://file-service:3333
+FILE_SERVICE_URL=http://object-api:3333
 FILE_VERIFY_ROUTE_URL=/api/v1/storage/objects/search
 AUTH_SERVICE_URL=http://auth-service:3333
 USER_SERVICE_URL=http://user-service:3333
