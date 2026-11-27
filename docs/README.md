@@ -29,7 +29,7 @@ Other services provide cross-cutting concerns:
 ## Documentation map
 
 | Document | What it covers |
-|----------|----------------|
+| ---------- | ---------------- |
 | [`database.md`](database.md) | Mermaid ER diagram and field dictionary for every table. |
 | [`api.md`](api.md) | Full REST API reference: routes, request/response shapes, auth rules, errors. |
 | [`events.md`](events.md) | Event catalog and Redis broker stream contract. |
@@ -92,7 +92,7 @@ Lesson-service/
 ┌─────────────────┐      Bearer token      ┌─────────────────┐
 │   API clients   │ ─────────────────────> │  Auth Service   │
 │  (Bruno / UI)   │                        └─────────────────┘
-└────────┬────────┘                                  │
+└────────┬────────┘                                 │
          │ verifyToken() middleware                 │
          v                                          v
 ┌─────────────────────────────────────────────────────────────┐
@@ -123,3 +123,11 @@ The existing root [`README.md`](../README.md) is out of date: it documents an ol
 a hardcoded author `"1"`, and an older route layout. This documentation set is grounded in the
 current source code and cites `file:line` references. Where the old README contradicts the code,
 these docs state the current behaviour and flag the discrepancy.
+
+## AI messages
+
+AI was used at different stages of the project:
+
+- Learning: understanding concepts and discovering the features of the installed modules.
+- Debugging and review: checking parts of the implementation to ensure good practices and data validity.
+- Final stage: reviewing pull requests and handling minor refactoring and small fixes, always under my supervision, with every changed line read.

@@ -6,7 +6,7 @@ The Lesson Service uses Redis Streams via `@yosone/broker`. It publishes its own
 
 | Setting               | Value                           | Source                                                                              |
 | --------------------- | ------------------------------- | ----------------------------------------------------------------------------------- |
-| Publish stream        | `lesson.service`                | [`app/utils/types.ts:5`](../Lesson-service/app/utils/types.ts)                      |
+| Publish stream        | `lesson.events`                | [`app/utils/types.ts:5`](../Lesson-service/app/utils/types.ts)                      |
 | Consumer group        | `CONSUMER_GROUP` env var        | [`providers/broker_provider.ts:33`](../Lesson-service/providers/broker_provider.ts) |
 | Consumer name         | `CONSUMER_NAME` env var         | [`providers/broker_provider.ts:34`](../Lesson-service/providers/broker_provider.ts) |
 | Redis URL             | `REDIS_HOST:REDIS_PORT`         | [`providers/broker_provider.ts:35`](../Lesson-service/providers/broker_provider.ts) |
