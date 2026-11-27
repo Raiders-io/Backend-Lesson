@@ -131,3 +131,4 @@ AI was used at different stages of the project:
 - Learning: understanding concepts and discovering the features of the installed modules.
 - Debugging and review: checking parts of the implementation to ensure good practices and data validity.
 - Final stage: reviewing pull requests and handling minor refactoring and small fixes, always under my supervision, with every changed line read.
+- Docs generation
